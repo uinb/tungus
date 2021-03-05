@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/tungus
+    username: username
+    password: password
+
+#logging:
+#  level.tech.uinb.tungus.service.impl.ScheduleServiceImpl: debug
