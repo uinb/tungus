@@ -18,6 +18,7 @@
  */
 package tech.uinb.tungus.service.impl;
 
+import java.util.Comparator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,21 +47,20 @@ public class BlockExtServiceImpl implements BlockExtService {
     }
 
     @Override
-    public long getExtIndexInBlockByExtId(long extId) {
+    public String getExtIndexInBlockByExtId(long extId) {
         var table = splitter.computeTable(extId);
         long blkid = blockExtRepository.getBlkIdByExtId(extId,table.tableName());
-        List<Long> blockExtsId = blockExtRepository.getExtIdsByBlkId(blkid,table.tableName())
+        List<BlockExt> blockExtsId = blockExtRepository.getExtIdsByBlkId(blkid,table.tableName())
                 .stream()
-                .map(BlockExt::getExtId)
-                .sorted()
+                .sorted(Comparator.comparingLong(BlockExt::getExtId))
                 .collect(Collectors.toList());
-        long index = 0;
+        int index = 0;
         for (int i = 0; i < blockExtsId.size(); i++) {
-            if (blockExtsId.get(i) == extId){
+            if (blockExtsId.get(i).getExtId() == extId){
                 index = i;
             }
         }
-        return index;
+        return blockExtsId.get(index).getBlkId()+"-"+index;
     }
 
     @PostConstruct
