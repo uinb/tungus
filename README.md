@@ -4,6 +4,25 @@
 
 Tungus is a blockchain explorer of FUSOTAO,it provides a view of blocks,extrinsics,events and account info from a browser.
 
+## Before
+
+Tungus depends on [polkaj](https://github.com/emeraldpay/polkaj), you need to install polkaj first.
+
+```bash
+
+# clone the polkaj project
+
+git clone https://github.com/emeraldpay/polkaj
+
+# enter the project directory
+
+cd polkaj
+
+# install polkaj
+
+./gradlew install -Dmaven.repo.local=~/.m2/repository/
+```
+
 ## Development
 
 ```bash
