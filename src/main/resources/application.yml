@@ -4,5 +4,7 @@ spring:
     username: username
     password: password
 
+connect: https://test-fuso.ngnexusccs.xyz/tt
+
 #logging:
 #  level.tech.uinb.tungus.service.impl.ScheduleServiceImpl: debug

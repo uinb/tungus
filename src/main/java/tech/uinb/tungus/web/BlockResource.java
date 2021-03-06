@@ -50,7 +50,7 @@ public class BlockResource {
                     break;
                 case EXTRINSICS:
                     Ext ext = blockService.getExtById(hashIdMap.getId());
-                    long index = blockExtService.getExtIndexInBlockByExtId(ext.getId());
+                    String index = blockExtService.getExtIndexInBlockByExtId(ext.getId());
                     resultMap.put("data",new ByteData(ext.getData()).toString());
                     resultMap.put("type",Constants.TYPE_CALLABLE);
                     resultMap.put("index",index);
