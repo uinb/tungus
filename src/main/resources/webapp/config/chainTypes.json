@@ -1,0 +1,32 @@
+{
+  "Address": "MultiAddress",
+  "LookupSource": "MultiAddress",
+  "BlockNumber": "u32",
+  "Signature": "MultiSignature",
+  "TokenInfo": {
+    "total": "Balance",
+    "symbol": "String"
+  },
+  "TokenId": "Hash",
+  "Receipt": {
+    "value": "Balance"
+  },
+  "Pair": "(AccountId, AccountId)",
+  "AccountData": {
+    "free": "Balance",
+    "reserved": "Balance",
+    "misc_frozen": "Balance",
+    "fee_frozen": "Balance"
+  },
+  "Dominator": {
+    "total_pledged": "Balance",
+    "total_hosted": "Balance",
+    "status": "DominatorStatus",
+    "assets_type": "Option<TokenId>"
+  },
+  "DominatorStatus": {
+    "_enum": ["Active", "Closing", "Banned"]
+  },
+  "UID": "u128",
+  "AssetId": "u32"
+}

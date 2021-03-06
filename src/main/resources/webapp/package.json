@@ -1,0 +1,52 @@
+{
+  "private": true,
+  "scripts": {
+    "start": "cross-env PORT=8080 umi dev",
+    "build": "cross-env UMI_ENV=prd umi build",
+    "build-test": "cross-env UMI_ENV=test umi build",
+    "postinstall": "umi generate tmp",
+    "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'",
+    "test": "umi-test",
+    "test:coverage": "umi-test --coverage"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx,less,md,json}": [
+      "prettier --write"
+    ],
+    "*.ts?(x)": [
+      "prettier --parser=typescript --write"
+    ]
+  },
+  "dependencies": {
+    "@ant-design/icons": "^4.4.0",
+    "@ant-design/pro-layout": "^6.5.0",
+    "@polkadot/api": "^3.6.4",
+    "@polkadot/extension-dapp": "^0.36.1",
+    "@polkadot/ui-keyring": "^0.66.3",
+    "@umijs/preset-react": "1.x",
+    "axios": "^0.21.1",
+    "classnames": "^2.2.6",
+    "dayjs": "^1.10.4",
+    "react-copy-to-clipboard": "^5.0.3",
+    "umi": "^3.3.6"
+  },
+  "devDependencies": {
+    "@svgr/webpack": "^5.5.0",
+    "@types/classnames": "^2.2.11",
+    "@types/react": "^16.9.0",
+    "@types/react-copy-to-clipboard": "^5.0.0",
+    "@types/react-dom": "^16.9.0",
+    "@umijs/test": "^3.3.6",
+    "antd-dayjs-webpack-plugin": "^1.0.6",
+    "cross-env": "^7.0.3",
+    "lint-staged": "^10.0.7",
+    "prettier": "^2.2.0",
+    "react": "17.x",
+    "react-dom": "17.x",
+    "typescript": "^4.1.2",
+    "yorkie": "^2.0.0"
+  }
+}

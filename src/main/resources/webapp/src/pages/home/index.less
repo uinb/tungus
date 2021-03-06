@@ -1,0 +1,184 @@
+@bg: #282727;
+@bg1: #282828;
+@fontColor2: #929292;
+@fontColor3: #e0e0e0;
+@fontColor4: #ff6726;
+@borderColor1: #343434;
+@red1: #ca1a20;
+@yellow1: #ff6726;
+@white: #fff;
+@black1: #171717;
+.home {
+  // 搜索区域
+  .search-area {
+    // overflow: hidden;
+    height: 260px;
+    padding-top: 64px;
+    background: url('../../assets/bg.png') no-repeat;
+    background-color: #1f1f1f;
+    background-size: 100% 100%;
+    h2 {
+      width: 320px;
+      margin: 0 auto 29px;
+      line-height: 36px;
+      font-weight: 800;
+      font-size: 36px;
+      text-align: center;
+      letter-spacing: 0.05em;
+      -webkit-background-clip: text;
+      color: transparent;
+      background-image: linear-gradient(
+        90deg,
+        rgba(244, 244, 244, 1),
+        rgba(195, 195, 195, 1)
+      );
+    }
+    .search-bar {
+      width: 720px;
+      margin: 0 auto;
+    }
+  }
+
+  // 统计区域
+  .total-area {
+    display: flex;
+    justify-content: space-between;
+    width: 1200px;
+    margin: -25px auto 24px;
+    filter: drop-shadow(4px 4px 6px rgba(0, 0, 0, 0.4));
+    .total-card {
+      width: 277.5px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      background-color: @black1;
+      border-radius: 4px;
+      border: 1px solid #4b4b4b;
+      img {
+        margin: 0 16px 0 28px;
+      }
+      h3 {
+        margin-bottom: 8px;
+        line-height: 34px;
+        font-size: 28px;
+        color: #fff;
+      }
+      span {
+        font-size: 12px;
+        color: @fontColor2;
+      }
+    }
+  }
+  // 详细列表卡片
+  .detail-area {
+    display: flex;
+    flex-wrap: wrap;
+    width: 1200px;
+    margin: 0 auto;
+    justify-content: space-between;
+    .detail-card {
+      width: 585px;
+      height: 392px;
+      margin-bottom: 32px;
+      background: @black1;
+      border: 1px solid #4b4b4b;
+      border-radius: 4px;
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 25px;
+        height: 63px;
+        border-bottom: 1px solid @borderColor1;
+        .title {
+          display: flex;
+          align-items: center;
+          img {
+            vertical-align: middle;
+            margin-right: 10px;
+          }
+          span {
+            font-size: 18px;
+            color: #fff;
+          }
+        }
+        > span {
+          width: 64px;
+          line-height: 24px;
+          background: @red1;
+          border-radius: 2px;
+          color: @fontColor3;
+          text-align: center;
+          font-size: 12px;
+          cursor: pointer;
+        }
+      }
+      ul {
+        height: 329px;
+        padding: 0 25px;
+        overflow-y: auto;
+        li {
+          height: 70px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-bottom: 1px solid @borderColor1;
+          span {
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+          }
+          .left {
+            span {
+              margin-right: 12px;
+              font-size: 14px;
+              font-weight: 500;
+              color: @yellow1;
+            }
+            :first-child {
+              color: @fontColor3;
+            }
+            .bottom {
+              span {
+                font-weight: normal;
+                font-size: 12px;
+                color: @white;
+              }
+              .keyword {
+                font-weight: 500;
+                color: @fontColor2;
+              }
+            }
+          }
+          .right {
+            width: 110px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            text-align: right;
+            span {
+              font-size: 13px;
+              font-weight: 500;
+              color: @fontColor2;
+            }
+            h5 {
+              font-size: 13px;
+              color: @fontColor2;
+              width: 100%;
+            }
+            h4 {
+              font-size: 14px;
+              color: @white;
+              width: 100%;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+.underline {
+  text-decoration: underline;
+  cursor: pointer;
+}

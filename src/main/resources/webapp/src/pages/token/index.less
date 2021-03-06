@@ -1,0 +1,99 @@
+.token {
+  color: #e0e0e0;
+  .search-bar {
+    margin: 24px 0 32px;
+  }
+  > h3 {
+    margin-bottom: 24px;
+    font-size: 18px;
+    line-height: 21px;
+    color: #ffffff;
+  }
+  .token-des {
+    margin-top: 12px;
+    padding: 16px 8px;
+    display: flex;
+    align-items: flex-start;
+    background-color: #282828;
+    > img {
+      margin-right: 16px;
+    }
+    h4 {
+      color: #e0e0e0;
+      font-size: 18px;
+    }
+    p {
+      line-height: 20px;
+      font-size: 13px;
+    }
+  }
+  .detail {
+    margin-top: 32px;
+    display: flex;
+    justify-content: space-between;
+    > div {
+      &:first-child {
+        flex: 0.9;
+      }
+      h4 {
+        font-size: 16px;
+        font-weight: normal;
+        color: #fff;
+      }
+      li {
+        height: 55px;
+        display: flex;
+        align-items: center;
+        // justify-content: space-between;
+        & + li {
+          border-top: 1px solid #343434;
+        }
+        > :first-child {
+          width: 150px;
+        }
+      }
+    }
+  }
+  .user-tab {
+    .bar {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      p {
+        font-size: 14px;
+        font-weight: normal;
+      }
+    }
+  }
+  //   datepicker
+  .ant-picker {
+    background-color: transparent;
+    border: none;
+  }
+  .ant-picker-focused {
+    outline: none;
+    box-shadow: none;
+  }
+  .ant-picker-range .ant-picker-active-bar {
+    display: none;
+  }
+  .ant-picker-input {
+    height: 32px;
+    width: 176px;
+    padding-left: 16px;
+    border: 1px solid #4a4a4a;
+    box-sizing: border-box;
+    border-radius: 4px;
+    > input {
+      color: #929292;
+    }
+  }
+  .ant-picker-range-separator {
+    color: #fff;
+  }
+  .user-table .ant-table {
+    font-size: 14px;
+    font-weight: normal;
+  }
+}
