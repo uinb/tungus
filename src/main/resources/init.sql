@@ -1,12 +1,13 @@
 create table t_block_extrinsic_0
 (
     blk_id bigint not null,
-    ext_id bigint not null
+    ext_id bigint not null,
+    key (blk_id)
 );
 
 create table t_block_header_0
 (
-    blk_id      bigint not null,
+    blk_id      bigint primary key,
     number      bigint not null,
     extrinsics  varchar(128),
     parent_hash varchar(128),
@@ -17,12 +18,13 @@ create table t_digest_log_0
 (
     blk_id bigint not null,
     idx    int    not null,
-    log    blob
+    log    blob,
+    key (blk_id)
 );
 
 create table t_extrinsics_0
 (
-    id   bigint not null,
+    id   bigint primary key,
     data blob
 );
 
@@ -30,7 +32,8 @@ create table t_hash_id_map_0
 (
     hash varchar(128) not null,
     id   bigint       not null,
-    type varchar(10)  not null
+    type varchar(10)  not null,
+    key (hash)
 );
 
 create table t_seq
@@ -59,31 +62,35 @@ create table t_table_meta
 create table t_account_extrinsic_0
 (
     account_id bigint not null,
-    ext_id     bigint not null
+    ext_id     bigint not null,
+    key (account_id)
 );
 
 create table t_account_transaction_0
 (
     account_id bigint not null,
-    ext_id     bigint not null
+    ext_id     bigint not null,
+    key (account_id)
 );
 
 create table t_account_stash_0
 (
     account_id bigint not null,
-    ext_id     bigint not null
+    ext_id     bigint not null,
+    key (account_id)
 );
 
 create table t_event_0
 (
-    id   bigint not null,
+    id   bigint primary key,
     data blob
 );
 
 create table t_ext_event_0
 (
     ext_id   bigint not null,
-    event_id bigint not null
+    event_id bigint not null,
+    key (ext_id)
 );
 
 insert into t_seq (prefix, value)
