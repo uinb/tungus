@@ -24,31 +24,38 @@ interface IBaseTable {
   data?: any[];
   type: 'block' | 'extrinsic' | 'account';
   showSearch?: boolean;
+  showTable?: boolean;
   onPageChange?: (page: number, pageSize?: number) => void;
 }
 const Main: React.FC<IBaseTable> = ({
   columns,
   data,
   showSearch = true,
+  showTable = true,
   onPageChange,
 }) => {
   return (
     <div className="block">
       {showSearch ? <BaseSearch /> : null}
-      <main>
-        <Table
-          columns={columns}
-          dataSource={data}
-          pagination={false}
-          className="user-table"
-        ></Table>
-      </main>
-      <Pagination
-        className="user-pagination"
-        total={100}
-        showSizeChanger={false}
-        onChange={onPageChange}
-      />
+      {showTable ? (
+        <>
+          <main>
+            <Table
+              columns={columns}
+              dataSource={data}
+              pagination={false}
+              className="user-table"
+            ></Table>
+          </main>
+          <Pagination
+            className="user-pagination"
+            total={data?.length}
+            showSizeChanger={false}
+            onChange={onPageChange}
+            hideOnSinglePage={true}
+          />
+        </>
+      ) : null}
     </div>
   );
 };

@@ -15,43 +15,114 @@
  * limitations under the License.
  */
 
-import React from 'react';
-import { useApi } from '@/context/ApiContext';
+import React, { useMemo } from 'react';
 import BaseTable from '../../components/BaseTable';
-const columns = [
-  {
-    title: 'Callable ID',
-    dataIndex: 'id',
-    key: 'id',
-  },
-  {
-    title: 'Block',
-    dataIndex: 'blcok',
-    key: 'block',
-  },
-  {
-    title: 'Callable Hash',
-    dataIndex: 'hash',
-    key: 'hash',
-  },
-  {
-    title: 'Time',
-    dataIndex: 'time',
-    key: 'time',
-  },
-  {
-    title: 'Result',
-    dataIndex: 'result',
-  },
-  {
-    title: 'Action',
-    dataIndex: 'action',
-  },
-];
+import { useLocation, useIntl } from 'umi';
+
+const typeList = ['transfer', 'stash', 'pledge'];
 const Block: React.FC = (props) => {
-  const { api } = useApi();
-  return api ? (
-    <BaseTable {...props} columns={columns} type="extrinsic" />
-  ) : null;
+  const intl = useIntl();
+  const location = useLocation();
+  const type = (location as any).query.type;
+  const typeColumns = useMemo(() => {
+    return {
+      default: [
+        {
+          title: `${intl.formatMessage({
+            id: 'callable',
+          })} ID`,
+          dataIndex: 'id',
+        },
+        {
+          title: intl.formatMessage({
+            id: 'block',
+          }),
+          dataIndex: 'blcok',
+        },
+        {
+          title: `${intl.formatMessage({
+            id: 'hash',
+          })}`,
+          dataIndex: 'hash',
+        },
+        {
+          title: intl.formatMessage({
+            id: 'time',
+          }),
+          dataIndex: 'time',
+        },
+        {
+          title: intl.formatMessage({
+            id: 'result',
+          }),
+          dataIndex: 'result',
+        },
+        {
+          title: intl.formatMessage({
+            id: 'action',
+          }),
+          dataIndex: 'action',
+        },
+      ],
+      transfer: [
+        {
+          title: `${intl.formatMessage({
+            id: 'callable',
+          })} ID`,
+          dataIndex: 'id',
+        },
+        {
+          title: intl.formatMessage({
+            id: 'block',
+          }),
+          dataIndex: 'blcok',
+        },
+        {
+          title: intl.formatMessage({
+            id: 'time',
+          }),
+          dataIndex: 'time',
+        },
+        {
+          title: intl.formatMessage({
+            id: 'from',
+          }),
+          dataIndex: 'from',
+        },
+        {
+          title: intl.formatMessage({
+            id: 'to',
+          }),
+          dataIndex: 'to',
+        },
+        {
+          title: intl.formatMessage({
+            id: 'amount',
+          }),
+          dataIndex: 'amount',
+        },
+        {
+          title: intl.formatMessage({
+            id: 'result',
+          }),
+          dataIndex: 'result',
+        },
+        {
+          title: `${intl.formatMessage({
+            id: 'hash',
+          })}`,
+          dataIndex: 'hash',
+        },
+      ],
+    };
+  }, [intl]);
+  return (
+    <BaseTable
+      {...props}
+      columns={typeColumns.default}
+      type={type}
+      showTable={type === undefined || typeList.includes(type)}
+    />
+  );
 };
 export default Block;

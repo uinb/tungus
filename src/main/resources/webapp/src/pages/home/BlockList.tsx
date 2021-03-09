@@ -16,11 +16,18 @@
  */
 import React, { useEffect, useState } from 'react';
 import ShortLink from '@/components/ShortLink';
-import FormatTime from '@/components/FormatTime';
 import { useApi } from '@/context/ApiContext';
 import SuccessfulIcon from '@/assets/successful.svg';
+import { formatNumber } from '@/utils/commonUtils';
 import type { Header } from '@polkadot/types/interfaces/runtime';
 
+interface IBlockProps {
+  blockNumber: number;
+  blockHash: string;
+  callables: number;
+  events: number;
+  timeStamp: number;
+}
 const isBlockInList = (block: Header, blockList: Header[]) => {
   return blockList.some((header) => header.number.eq(block.number));
 };
@@ -31,7 +38,7 @@ const LatestBLockList: React.FC = () => {
     let unsub: any = null;
     const subFun = async () => {
       if (api) {
-        unsub = await api.rpc.chain.subscribeFinalizedHeads((header) => {
+        unsub = await api.rpc.chain.subscribeFinalizedHeads(async (header) => {
           setBlockList((blockList) => {
             if (isBlockInList(header, blockList)) {
               return blockList;
@@ -39,7 +46,7 @@ const LatestBLockList: React.FC = () => {
               if (blockList.length < 20) {
                 return [header].concat(blockList);
               } else {
-                return [header].concat(blockList.slice(0, 20));
+                return [header].concat(blockList.slice(0, 19));
               }
             }
           });
@@ -50,7 +57,7 @@ const LatestBLockList: React.FC = () => {
     return () => {
       unsub & unsub();
     };
-  }, []);
+  }, [api]);
   return (
     <ul>
       {blockList.map((block) => {
@@ -63,7 +70,7 @@ const LatestBLockList: React.FC = () => {
                   isUnderline={true}
                   path="/block"
                   hash={block.hash.toString()}
-                  text={block.number.toString()}
+                  text={formatNumber(block.number.toNumber())}
                 />
               </div>
               <div className="bottom">

@@ -15,24 +15,21 @@
  * limitations under the License.
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useContext } from 'react';
 import { Tabs, Table, Tooltip } from 'antd';
-
 import CopyText from '@/components/CopyText';
 import Parameters from '@/components/Parameters';
-import { NavLink, useIntl } from 'umi';
+import ShortLink from '@/components/ShortLink';
+import Time from '@/components/FormatTime';
+import { RightOutlined, DownOutlined } from '@ant-design/icons';
+import { useIntl } from 'umi';
 
-import useFinalizedBlock from '@/hooks/useFinalizedBlock';
+import FinalizedContext from '@/context/FinalizedContext';
 import { extractExtrinsic, extractEventsWithFilter } from '@/utils/chainUtils';
+import { formatHash } from '@/utils/commonUtils';
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { formatTime, formatHash } from '@/utils/commonUtils';
-
-import { RightOutlined, DownOutlined } from '@ant-design/icons';
-import ShortLink from '@/components/ShortLink';
-import Time from '@/components/FormatTime';
-
 dayjs.extend(utc);
 const { TabPane } = Tabs;
 const PendingIcon = require('@/assets/pending.svg');
@@ -52,7 +49,7 @@ const BlockPanel: React.FC<IBlockPanel> = React.memo(
       blockNumber,
       eventData,
     );
-    const finalizedBlock = useFinalizedBlock();
+    const finalizedHeader = useContext(FinalizedContext);
     const blockTimeInfo = useMemo(() => {
       if (block) {
         const timeStr = block.block.extrinsics[0]?.args[0]?.toString();
@@ -64,12 +61,12 @@ const BlockPanel: React.FC<IBlockPanel> = React.memo(
       }
     }, [block]);
     const blockState = useMemo(() => {
-      if (finalizedBlock && blockNumber) {
-        return finalizedBlock.number.toNumber() > blockNumber;
+      if (finalizedHeader && blockNumber) {
+        return finalizedHeader.number.toNumber() > blockNumber;
       } else {
         return false;
       }
-    }, [blockNumber, finalizedBlock]);
+    }, [blockNumber, finalizedHeader]);
     const callableColumns = [
       {
         title: intl.formatMessage({ id: 'callableId' }),

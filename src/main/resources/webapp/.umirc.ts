@@ -15,12 +15,20 @@
  * limitations under the License.
  */
 
-import { defineConfig, dynamic } from 'umi';
+import { defineConfig } from 'umi';
+import child_process from 'child_process';
+
+const commit = child_process
+  .execSync('git show -s --format=%H')
+  .toString()
+  .trim()
+  .slice(0, 7);
 
 export default defineConfig({
   title: 'FusoScan',
   define: {
     WSS_URL: 'wss://test-fuso.ngnexusccs.xyz',
+    COMMIT: commit,
   },
   proxy: {
     '/api': {

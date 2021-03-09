@@ -70,4 +70,7 @@ export default {
   tokenTransferInfo:
     'A Total of {total} Transfers，Only the first {current} data are displayed.',
   tokenHolderInfo: 'Holders Address: A Total of {total} Token Holders',
+  from: 'From',
+  to: 'To',
+  blockHash: 'Block Hash',
 };

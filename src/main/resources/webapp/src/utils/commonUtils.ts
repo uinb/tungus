@@ -41,3 +41,14 @@ export const formatTime = (spaceTime: number) => {
 export const formatHash = (hash: string) => {
   return hash.replace(/(.{7})(.*)(.{5})/g, '$1....$3');
 };
+export const formatNumber = (num?: number) => {
+  if (num === undefined) {
+    return '';
+  }
+  let formatVal = num + '';
+  if (formatVal.indexOf('.') !== -1) {
+    return (num + '').replace(/(?!^)(?=(\d{3})+(\.\d+)$)/g, ',');
+  } else {
+    return (num + '').replace(/(?!^)(?=(\d{3})+$)/g, ',');
+  }
+};

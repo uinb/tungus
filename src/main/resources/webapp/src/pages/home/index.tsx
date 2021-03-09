@@ -15,22 +15,16 @@
  * limitations under the License.
  */
 
-import React, { FC, useState, useMemo } from 'react';
+import React, { FC, useContext } from 'react';
 import { Table } from 'antd';
 import BaseSearch from '@/components/BaseSearch';
 import BlockList from './BlockList';
-import { useIntl } from 'umi';
-import { useApi } from '../../context/ApiContext';
-import useFinalizedBlock from '@/hooks/useFinalizedBlock';
+import { useIntl, NavLink } from 'umi';
+import { useApi } from '@/context/ApiContext';
+import FinalizedContext from '@/context/FinalizedContext';
+import { formatNumber } from '@/utils/commonUtils';
 import './index.less';
 
-interface IBlockProps {
-  blockNumber: number;
-  blockHash: string;
-  callables: number;
-  events: number;
-  timeStamp: number;
-}
 interface ITransferProps {
   index: string;
   from: string;
@@ -51,8 +45,7 @@ interface IPledgeProps {
 }
 const Main: FC = () => {
   const intl = useIntl();
-  const finalizedBlock = useFinalizedBlock();
-  const [blockList, setBlockList] = useState<IBlockProps>();
+  const finalizedHeader = useContext(FinalizedContext);
   const stashColumns = [
     {
       title: intl.formatMessage({ id: 'stashAccount' }),
@@ -98,7 +91,7 @@ const Main: FC = () => {
         <div className="total-card">
           <img src={require('../../assets/final_block.svg')} alt="" />
           <div>
-            <h3>{finalizedBlock?.number.toNumber()}</h3>
+            <h3>{formatNumber(finalizedHeader?.number.toNumber())}</h3>
             <span>{intl.formatMessage({ id: 'finalizedBlock' })}</span>
           </div>
         </div>
@@ -131,7 +124,9 @@ const Main: FC = () => {
               <img src={require('../../assets/stash.svg')} alt="" />
               <span>{intl.formatMessage({ id: 'latestBlocks' })}</span>
             </div>
-            <span>{intl.formatMessage({ id: 'viewAll' })}</span>
+            <NavLink to="/block">
+              {intl.formatMessage({ id: 'viewAll' })}
+            </NavLink>
           </header>
           <BlockList />
         </div>
@@ -141,7 +136,9 @@ const Main: FC = () => {
               <img src={require('../../assets/transfer.svg')} alt="" />
               <span>{intl.formatMessage({ id: 'transfers' })}</span>
             </div>
-            <span>{intl.formatMessage({ id: 'viewAll' })}</span>
+            <NavLink to="/callable">
+              {intl.formatMessage({ id: 'viewAll' })}
+            </NavLink>
           </header>
           <ul>
             <li>
@@ -170,7 +167,9 @@ const Main: FC = () => {
               <img src={require('../../assets/logo_square.svg')} alt="" />
               <span>{intl.formatMessage({ id: 'stash' })} TAO</span>
             </div>
-            <span>{intl.formatMessage({ id: 'viewAll' })}</span>
+            <NavLink to="/callable">
+              {intl.formatMessage({ id: 'viewAll' })}
+            </NavLink>
           </header>
           <main
             style={{
@@ -192,7 +191,9 @@ const Main: FC = () => {
               <img src={require('../../assets/logo_square.svg')} alt="" />
               <span>{intl.formatMessage({ id: 'pledge' })} TAO</span>
             </div>
-            <span>{intl.formatMessage({ id: 'viewAll' })}</span>
+            <NavLink to="/callable">
+              {intl.formatMessage({ id: 'viewAll' })}
+            </NavLink>
           </header>
           <main
             style={{

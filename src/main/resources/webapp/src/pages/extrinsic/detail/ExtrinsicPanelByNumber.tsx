@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useContext } from 'react';
 import { useIntl } from 'umi';
 import {
   RightOutlined,
@@ -27,13 +27,12 @@ import Nodata from '@/components/Nodata';
 import Parameters from '@/components/Parameters';
 import CopyText from '@/components/CopyText';
 
+import { formatTime, formatHash } from '@/utils/commonUtils';
+import type { SignedBlock } from '@polkadot/types/interfaces/runtime';
+import FinalizedContext from '@/context/FinalizedContext';
+
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-
-import { formatTime, formatHash } from '@/utils/commonUtils';
-import { SignedBlock } from '@polkadot/types/interfaces/runtime';
-import useFinalizedBlock from '@/hooks/useFinalizedBlock';
-
 dayjs.extend(utc);
 const { TabPane } = Tabs;
 const PendingIcon = require('@/assets/pending.svg');
@@ -49,7 +48,7 @@ const ExtrinsicDetail: React.FC<{
   eventData: ChainTypes.IEvent[] | undefined;
 }> = ({ extrinsic, extrinsicState, block, eventData, blockNumber }) => {
   const intl = useIntl();
-  const finalizedBlock = useFinalizedBlock();
+  const finalizedHeader = useContext(FinalizedContext);
   const destination = useMemo(() => {
     if (
       extrinsic.method === 'transfer' ||
@@ -84,13 +83,13 @@ const ExtrinsicDetail: React.FC<{
     }
   }, [block]);
   const blockState = useMemo(() => {
-    if (finalizedBlock && block) {
+    if (finalizedHeader && block) {
       let res = block.block.header.number.toNumber();
-      return finalizedBlock.number.toNumber() > res;
+      return finalizedHeader.number.toNumber() > res;
     } else {
       return false;
     }
-  }, [block, finalizedBlock]);
+  }, [block, finalizedHeader]);
   const eventsColumns = [
     {
       title: intl.formatMessage({

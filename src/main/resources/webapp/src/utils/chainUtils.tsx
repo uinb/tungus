@@ -141,7 +141,7 @@ export const extractExtrinsic = (
       methodArgs: item.method.args,
       era: item.era,
       isSigned: item.isSigned,
-      signer: item.signer.tos,
+      signer: item.signer.toString(),
       signature: item.signature.toString(),
       nonce: item.nonce.toString(),
     };
@@ -172,7 +172,6 @@ export const extractEventsWithFilter = (
         : '';
       if (applyExtrinsic == filter.extrinsicIndex) {
         result = record.event.meta.name.toHuman();
-        // 查找失败原因
         if (result === 'ExtrinsicFailed') {
           const {
             Module: { index, error },
@@ -183,7 +182,6 @@ export const extractEventsWithFilter = (
             }
           });
         }
-        // 查找费率
         if (result === 'Deposit') {
           fee = record.event.data[1].toHuman();
         }

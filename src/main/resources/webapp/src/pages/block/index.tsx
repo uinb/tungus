@@ -15,45 +15,57 @@
  * limitations under the License.
  */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useApi } from '@/context/ApiContext';
+import { useIntl } from 'umi';
 import BaseTable from '../../components/BaseTable';
 import './index.less';
 
 const Block: React.FC = (props) => {
   const { api } = useApi();
-  const columns = [
-    {
-      title: 'Block',
-      dataIndex: 'block',
-      key: 'block',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-    },
-    {
-      title: 'Time',
-      dataIndex: 'time',
-      key: 'time',
-    },
-    {
-      title: 'Extrinsics',
-      dataIndex: 'extrinsics',
-      key: 'extrinsics',
-    },
-    {
-      title: 'Events',
-      dataIndex: 'events',
-      key: 'events',
-    },
-    {
-      title: 'Block hash',
-      dataIndex: 'blockhash',
-      key: 'blockhash',
-    },
-  ];
+  const intl = useIntl();
+  const columns = useMemo(
+    () => [
+      {
+        title: intl.formatMessage({
+          id: 'block',
+        }),
+        dataIndex: 'block',
+      },
+      {
+        title: intl.formatMessage({
+          id: 'status',
+        }),
+        dataIndex: 'status',
+      },
+      {
+        title: intl.formatMessage({
+          id: 'time',
+        }),
+        dataIndex: 'time',
+        key: 'time',
+      },
+      {
+        title: intl.formatMessage({
+          id: 'callables',
+        }),
+        dataIndex: 'callables',
+      },
+      {
+        title: intl.formatMessage({
+          id: 'events',
+        }),
+        dataIndex: 'events',
+      },
+      {
+        title: intl.formatMessage({
+          id: 'blockHash',
+        }),
+        dataIndex: 'blockhash',
+      },
+    ],
+    [intl],
+  );
   return api ? <BaseTable {...props} columns={columns} type="block" /> : null;
 };
 export default Block;
