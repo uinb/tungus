@@ -86,27 +86,26 @@ h6 {
   background-color: #212121;
   border: 1px solid #4a4a4a;
 }
-// 滚动条
-/*滚动条样式：谷歌浏览器下*/
+
 ::-webkit-scrollbar {
   width: 8px;
   background-color: #f5f7fa;
 }
-/*滚动条的轨道*/
+
 ::-webkit-scrollbar-track {
   background-color: #212121;
 }
-/*滚动条的滑块按钮*/
+
 ::-webkit-scrollbar-thumb {
   background: #4a4a4a;
   border-radius: 4px;
 }
-/*滚动条的上下两端的按钮*/
+
 ::-webkit-scrollbar-button {
   height: 0px;
   background-color: #b0aeda;
 }
-// 搜索样式
+
 .user-search {
   height: 34px;
   display: flex;
@@ -137,7 +136,7 @@ h6 {
 .block .search-bar {
   margin: 24px auto 32px;
 }
-// 搜索样式
+
 .search-bar {
   height: 48px;
   line-height: 48px;
@@ -215,7 +214,6 @@ h6 {
     border: none;
     border-radius: 4px;
   }
-  // button样式
   .ant-btn:hover,
   .ant-btn:focus,
   .ant-btn:active {
@@ -223,7 +221,6 @@ h6 {
   }
 }
 
-// table样式
 .user-table.f14 {
   .ant-table {
     font-size: 14px;
@@ -231,7 +228,6 @@ h6 {
   }
 }
 .user-table {
-  // antd table样式重置
   .ant-table {
     background-color: transparent;
     color: @fontColor3;
@@ -275,7 +271,7 @@ h6 {
     background: @borderColor1;
   }
 }
-// 分页样式
+
 .user-pagination {
   text-align: right;
   .ant-pagination-prev:not(.ant-pagination-disabled) .ant-pagination-item-link,
@@ -357,7 +353,7 @@ h6 {
     color: #fff;
   }
 }
-// tab样式
+
 .user-tab.ant-tabs {
   color: @white;
   font-weight: 500;
@@ -393,7 +389,7 @@ h6 {
     color: #fff;
   }
 }
-// 导航标签
+
 .ant-menu.ant-menu-horizontal {
   .ant-menu-item a {
     color: #929299;
@@ -479,7 +475,7 @@ div.with-padding > span {
     }
   }
 }
-// 分割线
+
 .split-line {
   margin: 0 20px;
   width: 1px;
@@ -533,5 +529,13 @@ div.with-padding > span {
         color: #e0e0e0;
       }
     }
+  }
+}
+.user-submenu {
+  .ant-menu-vertical.ant-menu-sub,
+  .ant-menu-vertical-left.ant-menu-sub,
+  .ant-menu-vertical-right.ant-menu-sub {
+    min-width: 90px;
+    text-align: center;
   }
 }

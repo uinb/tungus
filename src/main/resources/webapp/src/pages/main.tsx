@@ -2,8 +2,8 @@ import React from 'react';
 import { Spin } from 'antd';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { useApi, ApiContextProvider } from '../context/ApiContext';
-
+import { useApi, ApiContextProvider } from '@/context/ApiContext';
+import { FinalizedProvider } from '@/context/FinalizedContext';
 import './main.less';
 
 const Main: React.FC = (props) => {
@@ -26,7 +26,9 @@ const Main: React.FC = (props) => {
 };
 const MainWithProvider: React.FC = (props) => (
   <ApiContextProvider>
-    <Main {...props} />
+    <FinalizedProvider>
+      <Main {...props} />
+    </FinalizedProvider>
   </ApiContextProvider>
 );
 export default MainWithProvider;

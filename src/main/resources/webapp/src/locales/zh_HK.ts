@@ -69,4 +69,7 @@ export default {
   tokenHolders: '通證持有者',
   tokenTransferInfo: ' 共 {total} 個轉賬，列表僅展示最新的 {current} 條記錄',
   tokenHolderInfo: '當前共 {total} 通證持有者地址',
+  from: '來自',
+  to: '至',
+  blockHash: '區塊哈希',
 };
