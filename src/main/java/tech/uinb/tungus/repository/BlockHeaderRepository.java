@@ -25,30 +25,34 @@ import tech.uinb.tungus.entity.BlockHeader;
 @Repository
 public class BlockHeaderRepository {
 
-  @Autowired
-  private JdbcTemplate template;
+    @Autowired
+    private JdbcTemplate template;
 
-  public Long queryMaxId(String tableName) {
-    return template.queryForObject("select max(blk_id) from " + tableName, Long.class);
-  }
+    public Long queryMaxId(String tableName) {
+        return template.queryForObject("select max(blk_id) from " + tableName, Long.class);
+    }
 
-  public void save(Long blkId, String extrinsics, Long number,
-      String parentHash, String stateRoot, String tableName) {
-    template.execute((ConnectionCallback<Void>) con -> {
-      var stat = con.prepareStatement("insert into " + tableName
-          + " (blk_id, extrinsics, number, parent_hash, state_root) values (?, ?, ?, ?, ?)");
-      stat.setLong(1, blkId);
-      stat.setString(2, extrinsics);
-      stat.setLong(3, number);
-      stat.setString(4, parentHash);
-      stat.setString(5, stateRoot);
-      stat.execute();
-      return null;
-    });
-  }
+    public void save(Long blkId, String extrinsics, Long number, String parentHash,
+                     String stateRoot, Long createTime, Long extrinsicsCnt, Long eventsCnt,
+                     String tableName) {
+        template.execute((ConnectionCallback<Void>) con -> {
+            var stat = con.prepareStatement("insert into " + tableName
+                    + " (blk_id, extrinsics, number, parent_hash, state_root, create_time, extrinsics_cnt, events_cnt) values (?, ?, ?, ?, ?, ?, ?, ?)");
+            stat.setLong(1, blkId);
+            stat.setString(2, extrinsics);
+            stat.setLong(3, number);
+            stat.setString(4, parentHash);
+            stat.setString(5, stateRoot);
+            stat.setLong(6, createTime);
+            stat.setLong(7, extrinsicsCnt);
+            stat.setLong(8, eventsCnt);
+            stat.execute();
+            return null;
+        });
+    }
 
-  public BlockHeader queryByBlockId(long bId,String tableName){
-    return template.queryForObject("select * from" + tableName + " where blk_id = " + bId,BlockHeader.class);
-  }
+    public BlockHeader queryByBlockId(long bId, String tableName) {
+        return template.queryForObject("select * from" + tableName + " where blk_id = " + bId, BlockHeader.class);
+    }
 
 }
