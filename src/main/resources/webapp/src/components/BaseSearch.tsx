@@ -65,6 +65,8 @@ const BaseSearch: React.FC<ISearchProps> = ({
             history.push('/callable/' + key);
           } else if (type === 'block') {
             history.push('/block/' + key);
+          } else if (type === 'account') {
+            history.push('/account/' + key);
           }
         }
       });

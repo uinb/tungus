@@ -16,30 +16,44 @@
  */
 
 import React from 'react';
+import { Tooltip } from 'antd';
 import classnames from 'classnames';
 import { formatHash } from '@/utils/commonUtils';
 import { NavLink } from 'umi';
 
 interface IShortLink {
-  hash: string;
+  hash?: string;
   path: string;
   text?: string;
   isUnderline?: boolean;
+  style?: React.CSSProperties;
 }
 const ShortHashLink: React.FC<IShortLink> = ({
   hash,
   path,
   isUnderline,
   text,
+  style,
 }) => {
   const classes = classnames('yellow', {
     underline: isUnderline,
   });
   const fhash = formatHash(hash);
-  return (
-    <NavLink to={path + '/' + hash} className={classes}>
+  const Component = (
+    <NavLink
+      style={style}
+      to={path.replace(/\/$/, '') + '/' + hash}
+      className={classes}
+    >
       {text ? text : fhash}
     </NavLink>
+  );
+  return fhash ? (
+    <Tooltip title={hash} color="#474747">
+      {Component}
+    </Tooltip>
+  ) : (
+    Component
   );
 };
 export default ShortHashLink;

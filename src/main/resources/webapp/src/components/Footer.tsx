@@ -24,7 +24,7 @@ const Footer = () => {
       <nav>
         <a href="#">Home</a>
         <a href="#">Chain</a>
-        <a href="#">Acccounts</a>
+        <a href="#">Accounts</a>
         <a href="#">Analytics</a>
         <a href="#">Runtime</a>
       </nav>

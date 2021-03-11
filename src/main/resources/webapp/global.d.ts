@@ -60,11 +60,12 @@ declare global {
       method: string;
       methodArgs: AnyTuple;
       metaArgs: Vec<FunctionArgumentMetadataV9>;
-      isSigned: boolean;
+      isSigned?: boolean;
       signer?: string;
       nonce?: string;
       signature?: string;
       era?: GenericExtrinsicEra;
+      time?: string;
     }
   }
 }

@@ -136,7 +136,7 @@ const Main: FC = () => {
               <img src={require('../../assets/transfer.svg')} alt="" />
               <span>{intl.formatMessage({ id: 'transfers' })}</span>
             </div>
-            <NavLink to="/callable">
+            <NavLink to="/callable?type=transfer">
               {intl.formatMessage({ id: 'viewAll' })}
             </NavLink>
           </header>
@@ -167,7 +167,7 @@ const Main: FC = () => {
               <img src={require('../../assets/logo_square.svg')} alt="" />
               <span>{intl.formatMessage({ id: 'stash' })} TAO</span>
             </div>
-            <NavLink to="/callable">
+            <NavLink to="/callable?type=stash">
               {intl.formatMessage({ id: 'viewAll' })}
             </NavLink>
           </header>
@@ -191,7 +191,7 @@ const Main: FC = () => {
               <img src={require('../../assets/logo_square.svg')} alt="" />
               <span>{intl.formatMessage({ id: 'pledge' })} TAO</span>
             </div>
-            <NavLink to="/callable">
+            <NavLink to="/callable?type=pledge">
               {intl.formatMessage({ id: 'viewAll' })}
             </NavLink>
           </header>

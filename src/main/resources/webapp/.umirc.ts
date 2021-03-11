@@ -102,6 +102,22 @@ export default defineConfig({
       .plugin('antd-dayjs-webpack-plugin')
       .use('antd-dayjs-webpack-plugin')
       .end();
+    config.merge({
+      optimization: {
+        splitChunks: {
+          chunks: 'all',
+          minSize: 30000,
+          minChunks: 3,
+          cacheGroups: {
+            vendor: {
+              name: 'vendors',
+              test: /[\\/]node_modules[\\/]/,
+              priority: 10,
+            },
+          },
+        },
+      },
+    });
   },
   locale: {
     default: 'en_US',
