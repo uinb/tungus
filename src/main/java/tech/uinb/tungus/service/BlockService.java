@@ -6,6 +6,7 @@ import tech.uinb.tungus.codec.GeneralExtrinsicReader;
 import io.emeraldpay.polkaj.json.BlockJson;
 import io.emeraldpay.polkaj.types.ByteData;
 import io.emeraldpay.polkaj.types.Hash256;
+import tech.uinb.tungus.entity.BlockHeader;
 import tech.uinb.tungus.entity.Ext;
 
 public interface BlockService {
@@ -27,6 +28,7 @@ public interface BlockService {
         SUCCESS, UPDATE_METADATA, FAILED
     }
 
+    BlockHeader getBlockHeaderById(long id);
 
     Ext getExtById(long id);
 }

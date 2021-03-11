@@ -18,6 +18,7 @@
  */
 package tech.uinb.tungus.repository;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
@@ -35,5 +36,11 @@ public class ExtrinsicEventRepository {
             ps.execute();
             return null;
         });
+    }
+
+    public List<Long> queryListByExtId(long extId, String tableName) {
+        return template.queryForList(
+            "select event_id from " + tableName + " where ext_id = " + extId
+                + " order by event_id desc", Long.class);
     }
 }

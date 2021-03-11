@@ -22,7 +22,9 @@ import io.emeraldpay.polkaj.api.PolkadotMethod;
 import io.emeraldpay.polkaj.api.RpcCall;
 import io.emeraldpay.polkaj.api.StandardCommands;
 import io.emeraldpay.polkaj.apihttp.PolkadotHttpApi;
+import org.bouncycastle.util.encoders.Hex;
 import tech.uinb.tungus.codec.EventReader;
+import tech.uinb.tungus.codec.EventRecord;
 import tech.uinb.tungus.codec.EventWriter;
 import tech.uinb.tungus.codec.EventsReader;
 import tech.uinb.tungus.codec.GeneralExtrinsicReader;
@@ -74,6 +76,10 @@ public class ScheduleServiceImpl implements ScheduleService {
     private AtomicReference<EventsReader> eventsReader = new AtomicReference<>();
     private AtomicReference<EventReader> eventReader = new AtomicReference<>();
     private AtomicReference<EventWriter> eventWriter = new AtomicReference<>();
+
+    public AtomicReference<EventWriter> getEventWriter() {
+        return eventWriter;
+    }
 
     private boolean addTasks() {
         int cnt = 0;
@@ -388,4 +394,15 @@ public class ScheduleServiceImpl implements ScheduleService {
             } while (true);
         }
     }
+
+    public void decodeExtrinsic(byte[] data) {
+        var reader = new ScaleCodecReader(data);
+        var ext = extrinsicReader.get().read(reader);
+    }
+    public EventRecord decodeEvent(byte[] data) {
+        var reader = new ScaleCodecReader(data);
+        var event = eventReader.get().read(reader);
+        return event;
+    }
+
 }

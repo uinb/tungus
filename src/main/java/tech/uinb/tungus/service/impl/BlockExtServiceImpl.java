@@ -63,6 +63,19 @@ public class BlockExtServiceImpl implements BlockExtService {
         return blockExtsId.get(index).getBlkId()+"-"+index;
     }
 
+    @Override
+    public long getBlockIdByExtId(long extId) {
+        var table = splitter.computeTable(extId);
+        return blockExtRepository.getBlkIdByExtId(extId,table.tableName());
+    }
+
+    @Override
+    public long getFirstExtIdByExtId(long id) {
+        var table = splitter.computeTable(id);
+        long bId = blockExtRepository.getBlkIdByExtId(id,table.tableName());
+        return blockExtRepository.getExtIdsByBlkId(bId,table.tableName()).get(0).getExtId();
+    }
+
     @PostConstruct
     public void init() {
         splitter = new LongHashSplitter(tableMetaService.getByPrefix(TableMetaService.BLOCK_EXTRINSIC));
