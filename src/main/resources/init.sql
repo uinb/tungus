@@ -7,11 +7,14 @@ create table t_block_extrinsic_0
 
 create table t_block_header_0
 (
-    blk_id      bigint primary key,
-    number      bigint not null,
-    extrinsics  varchar(128),
-    parent_hash varchar(128),
-    state_root  varchar(128)
+    blk_id         bigint primary key,
+    number         bigint not null,
+    extrinsics     varchar(128),
+    parent_hash    varchar(128),
+    state_root     varchar(128),
+    create_time    bigint,
+    extrinsics_cnt bigint,
+    events_cnt     bigint
 );
 
 create table t_digest_log_0

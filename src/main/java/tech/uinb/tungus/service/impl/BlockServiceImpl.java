@@ -1,15 +1,15 @@
 /**
  * Copyright 2021 UINB Technologies Pte. Ltd.
- *
+ * <p>
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,10 +18,6 @@
  */
 package tech.uinb.tungus.service.impl;
 
-import tech.uinb.tungus.codec.EventRecord;
-import tech.uinb.tungus.codec.EventWriter;
-import tech.uinb.tungus.codec.EventsReader;
-import tech.uinb.tungus.codec.GeneralExtrinsicReader;
 import io.emeraldpay.polkaj.json.BlockJson;
 import io.emeraldpay.polkaj.scale.ScaleCodecReader;
 import io.emeraldpay.polkaj.scale.ScaleCodecWriter;
@@ -36,10 +32,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tech.uinb.tungus.codec.EventRecord;
+import tech.uinb.tungus.codec.EventWriter;
+import tech.uinb.tungus.codec.EventsReader;
+import tech.uinb.tungus.codec.GeneralExtrinsicReader;
 import tech.uinb.tungus.codec.fusotao.bean.extrinsic.*;
 import tech.uinb.tungus.entity.BlockHeader;
 import tech.uinb.tungus.entity.Ext;
-import tech.uinb.tungus.entity.ExtrinsicEvent;
 import tech.uinb.tungus.entity.ObjType;
 import tech.uinb.tungus.repository.BlockHeaderRepository;
 import tech.uinb.tungus.repository.DigestLogRepository;
@@ -52,7 +51,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -115,12 +113,6 @@ public class BlockServiceImpl implements BlockService {
                            EventWriter eventWriter) {
         hashIdMapService.save(hash.toString(), number, ObjType.BLOCK);
         var header = block.getHeader();
-        blockHeaderRepository.save(number,
-                header.getExtrinsicsRoot().toString(),
-                header.getNumber(),
-                header.getParentHash().toString(),
-                header.getStateRoot().toString(),
-                headerSplitter.computeTable(number).tableName());
         var digest = header.getDigest();
         if (digest != null) {
             var logs = digest.getLogs();
@@ -136,10 +128,22 @@ public class BlockServiceImpl implements BlockService {
 
         var extrinsics = block.getExtrinsics();
         Map<Long, ExtrinsicEventInfo> extEventMap = new HashMap<>();
+        long createTime = 0L;
+        long extrinsicsCnt = 0L;
         if (extrinsics != null && !extrinsics.isEmpty()) {
+            extrinsicsCnt = extrinsics.size();
             var seq = seqRepository.queryByPrefix(TableMetaService.EXTRINSICS);
             for (int i = 0; i < extrinsics.size(); i++) {
                 var extrinsic = extrinsics.get(i);
+
+                //第一个为时间
+                if (i == 0) {
+                    var ext = extrinsicReader.read(new ScaleCodecReader(extrinsic.getBytes()));
+                    FusotaoTimestampSet time = (FusotaoTimestampSet) ext.getCall();
+                    createTime = time.getNow().longValue();
+                }
+
+
                 var id = seq.incrementAndGet();
                 var data = extrinsic.getBytes();
                 extRepository.save(id, data, extrinsicSplitter.computeTable(id).tableName());
@@ -147,19 +151,21 @@ public class BlockServiceImpl implements BlockService {
                 hashIdMapService.save(extrinsicHash.toString(), id, ObjType.EXTRINSICS);
                 decodeExtrinsic(extrinsicReader, extrinsic.getBytes(), id);
                 blockExtService.save(number, id);
-                extEventMap.put((long)i, new ExtrinsicEventInfo(id));
+                extEventMap.put((long) i, new ExtrinsicEventInfo(id));
             }
             seqRepository.update(seq);
         }
 
+        long eventsCnt = 0L;
         if (eventsData != null) {
             var reader = new ScaleCodecReader(eventsData.getBytes());
             var events = eventsReader.read(reader);
             if (events != null && !events.isEmpty()) {
+                eventsCnt = events.size();
                 for (EventRecord event : events) {
                     var eventId = saveEvent(eventWriter, event);
                     var extIdx = event.getExtrinsicIdx();
-                    var info  = extEventMap.get(extIdx);
+                    var info = extEventMap.get(extIdx);
                     if (info != null) {
                         info.eventId.add(eventId);
                     }
@@ -168,11 +174,21 @@ public class BlockServiceImpl implements BlockService {
                 for (Map.Entry<Long, ExtrinsicEventInfo> entry : extEventMap.entrySet()) {
                     var id = entry.getValue().id;
                     entry.getValue().eventId.forEach(eventId -> {
-                        extrinsicEventService.save(id,eventId);
+                        extrinsicEventService.save(id, eventId);
                     });
                 }
             }
         }
+
+        blockHeaderRepository.save(number,
+                header.getExtrinsicsRoot().toString(),
+                header.getNumber(),
+                header.getParentHash().toString(),
+                header.getStateRoot().toString(),
+                createTime,
+                extrinsicsCnt,
+                eventsCnt,
+                headerSplitter.computeTable(number).tableName());
 
         return SaveResult.SUCCESS;
     }
@@ -181,14 +197,14 @@ public class BlockServiceImpl implements BlockService {
     public BlockHeader getBlockHeaderById(long id) {
         Splitter splitter = new LongHashSplitter(tableMetaService.getByPrefix(TableMetaService.BLOCK_HEADER));
         var table = splitter.computeTable(id);
-        return blockHeaderRepository.queryByBlockId(id,table.tableName());
+        return blockHeaderRepository.queryByBlockId(id, table.tableName());
     }
 
     @Override
     public Ext getExtById(long id) {
         Splitter splitter = new LongHashSplitter(tableMetaService.getByPrefix(TableMetaService.EXTRINSICS));
         var table = splitter.computeTable(id);
-        return  extRepository.queryExtId(id,table.tableName());
+        return extRepository.queryExtId(id, table.tableName());
     }
 
     private long saveEvent(EventWriter writer, EventRecord event) {
