@@ -18,6 +18,7 @@
  */
 package tech.uinb.tungus.service.impl;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,6 +43,11 @@ public class ExtrinsicEventServiceImpl implements ExtrinsicEventService {
         extrinsicEventRepository.save(extId, eventId, table.tableName());
     }
 
+    @Override
+    public List<Long> getEventIdByExtId(long extId) {
+        var table = splitter.computeTable(extId);
+        return extrinsicEventRepository.queryListByExtId(extId,table.tableName());
+    }
 
     @PostConstruct
     public void init() {

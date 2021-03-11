@@ -37,7 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tech.uinb.tungus.codec.fusotao.bean.extrinsic.*;
+import tech.uinb.tungus.entity.BlockHeader;
 import tech.uinb.tungus.entity.Ext;
+import tech.uinb.tungus.entity.ExtrinsicEvent;
 import tech.uinb.tungus.entity.ObjType;
 import tech.uinb.tungus.repository.BlockHeaderRepository;
 import tech.uinb.tungus.repository.DigestLogRepository;
@@ -133,7 +135,7 @@ public class BlockServiceImpl implements BlockService {
         }
 
         var extrinsics = block.getExtrinsics();
-        Map<Long, List<Long>> extEventMap = new HashMap<>();
+        Map<Long, ExtrinsicEventInfo> extEventMap = new HashMap<>();
         if (extrinsics != null && !extrinsics.isEmpty()) {
             var seq = seqRepository.queryByPrefix(TableMetaService.EXTRINSICS);
             for (int i = 0; i < extrinsics.size(); i++) {
@@ -145,7 +147,7 @@ public class BlockServiceImpl implements BlockService {
                 hashIdMapService.save(extrinsicHash.toString(), id, ObjType.EXTRINSICS);
                 decodeExtrinsic(extrinsicReader, extrinsic.getBytes(), id);
                 blockExtService.save(number, id);
-                extEventMap.put(id, new ArrayList<>(0));
+                extEventMap.put((long)i, new ExtrinsicEventInfo(id));
             }
             seqRepository.update(seq);
         }
@@ -157,19 +159,29 @@ public class BlockServiceImpl implements BlockService {
                 for (EventRecord event : events) {
                     var eventId = saveEvent(eventWriter, event);
                     var extIdx = event.getExtrinsicIdx();
-                    var list = extEventMap.get(extIdx);
-                    if (list != null) {
-                        list.add(eventId);
+                    var info  = extEventMap.get(extIdx);
+                    if (info != null) {
+                        info.eventId.add(eventId);
                     }
                 }
 
-                for (Map.Entry<Long, List<Long>> entry : extEventMap.entrySet()) {
-                    extrinsicEventService.save(entry.getKey(), entry.getKey());
+                for (Map.Entry<Long, ExtrinsicEventInfo> entry : extEventMap.entrySet()) {
+                    var id = entry.getValue().id;
+                    entry.getValue().eventId.forEach(eventId -> {
+                        extrinsicEventService.save(id,eventId);
+                    });
                 }
             }
         }
 
         return SaveResult.SUCCESS;
+    }
+
+    @Override
+    public BlockHeader getBlockHeaderById(long id) {
+        Splitter splitter = new LongHashSplitter(tableMetaService.getByPrefix(TableMetaService.BLOCK_HEADER));
+        var table = splitter.computeTable(id);
+        return blockHeaderRepository.queryByBlockId(id,table.tableName());
     }
 
     @Override
@@ -295,5 +307,14 @@ public class BlockServiceImpl implements BlockService {
             accountId = hashIdMap.getId();
         }
         return accountId;
+    }
+
+    private class ExtrinsicEventInfo {
+        final Long id;
+        final ArrayList<Long> eventId = new ArrayList<>();
+
+        ExtrinsicEventInfo(Long id) {
+            this.id = id;
+        }
     }
 }

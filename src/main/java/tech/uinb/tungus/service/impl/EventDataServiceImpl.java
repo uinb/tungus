@@ -21,6 +21,7 @@ package tech.uinb.tungus.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tech.uinb.tungus.entity.EventData;
 import tech.uinb.tungus.service.TableMetaService;
 import tech.uinb.tungus.repository.EventDataRepository;
 import tech.uinb.tungus.repository.SeqRepository;
@@ -30,7 +31,7 @@ import javax.annotation.PostConstruct;
 
 @Service
 @Transactional
-public class EventDataDataServiceImpl implements EventDataService {
+public class EventDataServiceImpl implements EventDataService {
     @Autowired
     private TableMetaService tableMetaService;
     @Autowired
@@ -41,12 +42,18 @@ public class EventDataDataServiceImpl implements EventDataService {
 
     @Override
     public long save(byte[] data) {
-        var seq = seqRepository.queryByPrefix(TableMetaService.EXTRINSICS);
+        var seq = seqRepository.queryByPrefix(TableMetaService.EVENT);
         var id = seq.incrementAndGet();
         var table = splitter.computeTable(id);
         eventDataRepository.save(id, data, table.tableName());
         seqRepository.update(seq);
         return id;
+    }
+
+    @Override
+    public EventData getEventDataById(long id) {
+        var table = splitter.computeTable(id);
+        return eventDataRepository.queryEventId(id,table.tableName());
     }
 
     @PostConstruct

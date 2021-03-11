@@ -6,5 +6,7 @@ public interface BlockExtService {
 
     String getExtIndexInBlockByExtId(long extId);
 
+    long getBlockIdByExtId(long extId);
 
+    long getFirstExtIdByExtId(long id);
 }

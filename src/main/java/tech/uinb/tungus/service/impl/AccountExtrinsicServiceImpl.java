@@ -18,6 +18,7 @@
  */
 package tech.uinb.tungus.service.impl;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ import javax.annotation.PostConstruct;
 @Service
 @Transactional
 public class AccountExtrinsicServiceImpl implements AccountExtrinsicService {
+
     @Autowired
     private TableMetaService tableMetaService;
     @Autowired
@@ -40,6 +42,12 @@ public class AccountExtrinsicServiceImpl implements AccountExtrinsicService {
     public void save(long accountId, long extId) {
         var table = splitter.computeTable(accountId);
         accountExtrinsicsRepository.save(accountId, extId, table.tableName());
+    }
+
+    @Override
+    public List<Long> getExtIdsByAccount(long accountId) {
+        var table = splitter.computeTable(accountId);
+        return accountExtrinsicsRepository.queryListByAccount(accountId,table.tableName());
     }
 
     @PostConstruct
