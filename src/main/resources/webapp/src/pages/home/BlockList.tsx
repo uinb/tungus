@@ -16,53 +16,45 @@
  */
 import React, { useEffect, useState } from 'react';
 import ShortLink from '@/components/ShortLink';
-import { useApi } from '@/context/ApiContext';
+import Time from '@/components/FormatTime';
 import SuccessfulIcon from '@/assets/successful.svg';
 import { formatNumber } from '@/utils/commonUtils';
-import type { Header } from '@polkadot/types/interfaces/runtime';
+import { getRecords } from '@/api/api';
 
-interface IBlockProps {
-  blockNumber: number;
-  blockHash: string;
-  callables: number;
-  events: number;
-  timeStamp: number;
+interface IBlockList {
+  blkId: number;
+  createTime: number;
+  eventsCnt: number;
+  extrinsicsCnt: number;
+  number: number;
+  hash: string;
 }
-const isBlockInList = (block: Header, blockList: Header[]) => {
-  return blockList.some((header) => header.number.eq(block.number));
-};
+
 const LatestBLockList: React.FC = () => {
-  const { api } = useApi();
-  const [blockList, setBlockList] = useState<Header[]>([]);
+  const [blockList, setBlockList] = useState<IBlockList[]>([]);
+  const getBlockRecords = () => {
+    getRecords('block', {
+      page: 1,
+      size: 5,
+    }).then((res) => {
+      setBlockList(res.data.list);
+    });
+  };
   useEffect(() => {
-    let unsub: any = null;
-    const subFun = async () => {
-      if (api) {
-        unsub = await api.rpc.chain.subscribeFinalizedHeads(async (header) => {
-          setBlockList((blockList) => {
-            if (isBlockInList(header, blockList)) {
-              return blockList;
-            } else {
-              if (blockList.length < 20) {
-                return [header].concat(blockList);
-              } else {
-                return [header].concat(blockList.slice(0, 19));
-              }
-            }
-          });
-        });
-      }
-    };
-    subFun();
+    getBlockRecords();
+    const timer = setInterval(() => {
+      getBlockRecords();
+    }, 6000);
     return () => {
-      unsub & unsub();
+      clearInterval(timer);
     };
-  }, [api]);
+  }, []);
+
   return (
     <ul>
       {blockList.map((block) => {
         return (
-          <li key={block.number.toNumber()}>
+          <li key={block.number}>
             <div className="left">
               <div className="top">
                 <span>Block#</span>
@@ -70,18 +62,18 @@ const LatestBLockList: React.FC = () => {
                   isUnderline={true}
                   path="/block"
                   hash={block.hash.toString()}
-                  text={formatNumber(block.number.toNumber())}
+                  text={formatNumber(block.number)}
                 />
               </div>
               <div className="bottom">
                 <span className="keyword">Includes</span>
-                <span>0 Extrinsics</span>
-                <span>0 Events</span>
+                <span>{block.extrinsicsCnt} Callables</span>
+                <span>{block.eventsCnt} Events</span>
               </div>
             </div>
             <div className="right">
               <img src={SuccessfulIcon} alt="" className="status" />
-              {/* <FormatTime time={block}/> */}
+              <Time time={block.createTime} />
             </div>
           </li>
         );

@@ -15,57 +15,109 @@
  * limitations under the License.
  */
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
+import BaseTable from '../../components/BaseTable';
+import ShortLink from '@/components/ShortLink';
+import Time from '@/components/FormatTime';
+import { getRecords } from '@/api/api';
 import { useApi } from '@/context/ApiContext';
 import { useIntl } from 'umi';
-import BaseTable from '../../components/BaseTable';
 import './index.less';
-
-const Block: React.FC = (props) => {
-  const { api } = useApi();
+const SuccessIcon = require('@/assets/successful.svg');
+interface IBlockData {
+  dataList: IBlockList[];
+  total: number;
+}
+interface IBlockList {
+  blkId: number;
+  createTime: number;
+  eventsCnt: number;
+  extrinsicsCnt: number;
+  number: number;
+  hash: string;
+}
+const Block: React.FC = () => {
   const intl = useIntl();
-  const columns = useMemo(
-    () => [
-      {
-        title: intl.formatMessage({
-          id: 'block',
-        }),
-        dataIndex: 'block',
-      },
-      {
-        title: intl.formatMessage({
-          id: 'status',
-        }),
-        dataIndex: 'status',
-      },
-      {
-        title: intl.formatMessage({
-          id: 'time',
-        }),
-        dataIndex: 'time',
-        key: 'time',
-      },
-      {
-        title: intl.formatMessage({
-          id: 'callables',
-        }),
-        dataIndex: 'callables',
-      },
-      {
-        title: intl.formatMessage({
-          id: 'events',
-        }),
-        dataIndex: 'events',
-      },
-      {
-        title: intl.formatMessage({
-          id: 'blockHash',
-        }),
-        dataIndex: 'blockhash',
-      },
-    ],
-    [intl],
-  );
-  return api ? <BaseTable {...props} columns={columns} type="block" /> : null;
+  const [loading, setLoading] = useState<boolean>(false);
+  const [blockData, setBlockData] = useState<IBlockData>();
+  const columns = [
+    {
+      title: intl.formatMessage({
+        id: 'block',
+      }),
+      dataIndex: 'number',
+      width: 200,
+    },
+    {
+      title: intl.formatMessage({
+        id: 'status',
+      }),
+      dataIndex: 'status',
+      width: 150,
+      render: () => <img src={SuccessIcon} alt="" />,
+    },
+    {
+      title: intl.formatMessage({
+        id: 'time',
+      }),
+      dataIndex: 'createTime',
+      width: 200,
+      render: (text: number) => <Time time={text} />,
+    },
+    {
+      title: intl.formatMessage({
+        id: 'callables',
+      }),
+      dataIndex: 'extrinsicsCnt',
+      width: 120,
+    },
+    {
+      title: intl.formatMessage({
+        id: 'events',
+      }),
+      dataIndex: 'eventsCnt',
+      width: 120,
+    },
+    {
+      title: intl.formatMessage({
+        id: 'blockHash',
+      }),
+      dataIndex: 'hash',
+      render: (text: string) => <ShortLink hash={text} path="/block" />,
+    },
+  ];
+  const onPageChange = (page: number, pageSize = 16) => {
+    getDataList(page, pageSize);
+  };
+  const getDataList = (page: number, size: number) => {
+    setLoading(true);
+    getRecords('block', {
+      page,
+      size,
+    })
+      .then((res) => {
+        setBlockData({
+          dataList: res.data.list,
+          total: res.data.total,
+        });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+  useEffect(() => {
+    getDataList(1, 10);
+  }, []);
+  return blockData ? (
+    <BaseTable
+      onPageChange={onPageChange}
+      loading={loading}
+      columns={columns}
+      data={blockData.dataList}
+      total={blockData.total}
+      type="block"
+      rowKey="blkId"
+    />
+  ) : null;
 };
-export default Block;
+export default React.memo(Block);

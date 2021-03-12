@@ -42,7 +42,7 @@ const ShortHashLink: React.FC<IShortLink> = ({
   const Component = (
     <NavLink
       style={style}
-      to={path.replace(/\/$/, '') + '/' + hash}
+      to={path.replace(/\/$/, '') + '/' + (hash || text)}
       className={classes}
     >
       {text ? text : fhash}

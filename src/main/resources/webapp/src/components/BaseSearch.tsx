@@ -149,12 +149,7 @@ const BaseSearch: React.FC<ISearchProps> = ({
         ></div>
       ) : null}
 
-      <Button
-        onClick={handleSearch}
-        style={{
-          borderRadius: !split2 ? '0 4px 4px 0' : '4px',
-        }}
-      >
+      <Button onClick={handleSearch}>
         <SearchOutlined
           style={{
             color: '#fff',

@@ -80,7 +80,7 @@ const TransferTable: React.FC<IProps> = ({ dataList, api }) => {
       })} ID`,
       dataIndex: 'id',
       render: (text: string) => {
-        return <ShortLink isUnderline={true} text={text} path="/callable" />;
+        return <ShortLink isUnderline={false} text={text} path="/callable" />;
       },
       width: 120,
     },

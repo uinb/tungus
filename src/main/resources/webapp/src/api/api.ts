@@ -17,11 +17,15 @@
 
 import axios from 'axios';
 interface IPage {
-  account: string;
   page: number;
   size: number;
 }
+
 export const scan_search = (key: string) =>
   axios.get('/api/v1/fusotao/search/' + key);
-export const getAccountData = (type: string, data: IPage) =>
+
+export const getAccountData = <T extends IPage>(type: string, data: T) =>
   axios.post('/api/v1/fusotao/scan/' + type, data);
+
+export const getRecords = <T extends IPage>(type: string, data: T) =>
+  axios.post('/api/v1/fusotao/record/' + type, data);

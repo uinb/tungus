@@ -36,38 +36,38 @@ interface IPage {
   current: number;
   total: number;
 }
-interface IData {
+interface IDataList {
   ext: string;
   events: string;
   ext1st: string;
   block: number;
   extIndex: string;
 }
+interface IData {
+  dataList: IDataList[];
+  total: number;
+}
+
 const defaultPageOptions = {
   pageSize: 5,
   current: 1,
   total: 0,
 };
-const defaultLoadingMap = {
-  callable: false,
-  transfer: false,
-  stash: false,
-};
 const AccountDetail: React.FC = () => {
   const intl = useIntl();
   const { id } = useParams<IRouteParams>();
   const { api } = useApi();
-  const [callableData, setCallableData] = useState<IData[]>([]);
-  const [transferData, setTransferData] = useState<IData[]>([]);
-  const [stashData, setStashData] = useState<IData[]>([]);
+  const [callableData, setCallableData] = useState<IData>();
+  const [transferData, setTransferData] = useState<IData>();
+  const [stashData, setStashData] = useState<IData>();
   const [userInfo, setUserInfo] = useState<AccountInfo>();
   const [activeKey, setActiveKey] = useState<string>('callable');
   const [pageOptions, setPageOptions] = useState<IPage>(defaultPageOptions);
-  const [loadingMap, setLoadingMap] = useState<{
-    [key: string]: boolean;
-  }>(defaultLoadingMap);
+  const [loading, setLoading] = useState<boolean>(false);
   const onTabChange = useCallback((key: string) => {
     setActiveKey(key);
+    setPageOptions(defaultPageOptions);
+    getSingleList(key, defaultPageOptions);
   }, []);
   const getUserInfo = async () => {
     if (api) {
@@ -79,33 +79,53 @@ const AccountDetail: React.FC = () => {
       }
     }
   };
-  const getDataList = (type?: string, options?: IPage) => {
-    let key = type ? type : activeKey;
-    setLoadingMap({ ...loadingMap, [key]: true });
-    getAccountData(key, {
-      account: id,
-      page: options ? options.current : pageOptions.current,
-      size: options ? options.pageSize : pageOptions.pageSize,
-    })
-      .then((res) => {
-        const data = res.data.list;
-        if (key === 'callable') {
-          setCallableData(data);
-        } else if (key === 'transfer') {
-          setTransferData(data);
-        } else {
-          setStashData(data);
-        }
-        setPageOptions((preOptions) => ({
-          ...preOptions,
-          total: res.data.total,
-        }));
+  const getDataList = (key: string, options?: IPage) => {
+    return new Promise((resolve, reject) => {
+      getAccountData(key, {
+        account: id,
+        page: options ? options.current : pageOptions.current,
+        size: options ? options.pageSize : pageOptions.pageSize,
       })
-      .finally(() => {
-        setLoadingMap({
-          ...loadingMap,
-          [key]: false,
+        .then((res) => {
+          const data = {
+            dataList: res.data.list,
+            total: res.data.total,
+          };
+          if (key === 'callable') {
+            setCallableData(data);
+          } else if (key === 'transfer') {
+            setTransferData(data);
+          } else {
+            setStashData(data);
+          }
+          setPageOptions((preOptions) => ({
+            ...preOptions,
+            total: res.data.total,
+          }));
+          resolve(data);
+        })
+        .catch((err) => {
+          reject(err);
         });
+    });
+  };
+  const getSingleList = (type?: string, options?: IPage) => {
+    let key = type ? type : activeKey;
+    setLoading(true);
+    getDataList(key, options).finally(() => {
+      setLoading(false);
+    });
+  };
+  const getAllList = () => {
+    setLoading(true);
+    Promise.all([
+      getDataList('callable'),
+      getDataList('transfer'),
+      getDataList('stash'),
+    ])
+      .then()
+      .finally(() => {
+        setLoading(false);
       });
   };
   const onPageChange = (current: number) => {
@@ -115,7 +135,7 @@ const AccountDetail: React.FC = () => {
         current,
       };
     });
-    getDataList(undefined, {
+    getSingleList(undefined, {
       ...pageOptions,
       current,
     });
@@ -125,9 +145,7 @@ const AccountDetail: React.FC = () => {
     getUserInfo();
   }, [id]);
   useEffect(() => {
-    getDataList('callable');
-    getDataList('transfer');
-    getDataList('stash');
+    getAllList();
   }, [id]);
   return (
     <div className="chain-detail base-container">
@@ -154,7 +172,7 @@ const AccountDetail: React.FC = () => {
               </li>
             </ul>
           </div>
-          <Spin spinning={loadingMap[activeKey]}>
+          <Spin spinning={loading}>
             <div className="base-card">
               <Tabs
                 className="user-tab"
@@ -164,23 +182,31 @@ const AccountDetail: React.FC = () => {
                 <TabPane
                   tab={`${intl.formatMessage({
                     id: 'callables',
-                  })} (${callableData.length})`}
+                  })} (${callableData?.total || 0})`}
                   key="callable"
                 >
-                  <CallableTable api={api} dataList={callableData} />
+                  {callableData ? (
+                    <CallableTable api={api} dataList={callableData.dataList} />
+                  ) : (
+                    <Nodata />
+                  )}
                 </TabPane>
                 <TabPane
                   tab={`${intl.formatMessage({
                     id: 'transfer',
-                  })} (${transferData.length})`}
+                  })} (${transferData?.total || 0})`}
                   key="transfer"
                 >
-                  <TransferTable api={api} dataList={transferData} />
+                  {transferData ? (
+                    <TransferTable api={api} dataList={transferData.dataList} />
+                  ) : (
+                    <Nodata />
+                  )}
                 </TabPane>
                 <TabPane
                   tab={`${intl.formatMessage({
                     id: 'stash',
-                  })} TAO (${stashData.length})`}
+                  })} (${stashData?.total || 0})`}
                   key="stash"
                 ></TabPane>
               </Tabs>

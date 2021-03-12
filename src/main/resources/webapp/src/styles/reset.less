@@ -1,0 +1,73 @@
+@import './variables.less';
+ul,
+li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+/** scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  background-color: #f5f7fa;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #212121;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-button {
+  height: 0px;
+  background-color: #b0aeda;
+}
+/** antd css reset */
+// antd-menu样式重置
+.ant-menu-horizontal {
+  line-height: 56px;
+  border: none;
+  background-color: transparent;
+  color: @grey1;
+}
+.ant-menu-horizontal > .ant-menu-item,
+.ant-menu-horizontal > .ant-menu-submenu {
+  border: none;
+  font-weight: 500;
+}
+.ant-menu-horizontal:not(.ant-menu-dark) {
+  > .ant-menu-item-selected,
+  > .ant-menu-item:hover,
+  > .ant-menu-submenu:hover,
+  > .ant-menu-submenu-active,
+  > .ant-menu-submenu-open,
+  > .ant-menu-submenu-selected {
+    color: #fff;
+    border-bottom: none;
+  }
+  > .ant-menu-item-selected,
+  > .ant-menu-submenu-selected {
+    background-color: @red1;
+  }
+  > .ant-menu-item,
+  > .ant-menu-submenu {
+    margin: 0;
+    padding: 0 15px;
+  }
+  .ant-menu-submenu-title:hover {
+    color: #fff;
+  }
+  .ant-menu-submenu-title .anticon {
+    margin: 0;
+  }
+}

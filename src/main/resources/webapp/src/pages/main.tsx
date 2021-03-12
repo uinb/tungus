@@ -4,7 +4,8 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useApi, ApiContextProvider } from '@/context/ApiContext';
 import { FinalizedProvider } from '@/context/FinalizedContext';
-import './main.less';
+import '../styles/reset.less';
+import '../styles/common.less';
 
 const Main: React.FC = (props) => {
   const { apiState } = useApi();
@@ -17,11 +18,11 @@ const Main: React.FC = (props) => {
     return Loader;
   }
   return (
-    <div id="app">
+    <>
       <Header />
-      {props.children}
+      <main>{props.children}</main>
       <Footer />
-    </div>
+    </>
   );
 };
 const MainWithProvider: React.FC = (props) => (
