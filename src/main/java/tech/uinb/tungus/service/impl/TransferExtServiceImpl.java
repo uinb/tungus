@@ -35,6 +35,7 @@ public class TransferExtServiceImpl implements TransferExtService {
         var id = seq.incrementAndGet();
         var table = splitter.computeTable(id);
         transferExtRepository.save(id, extId, table.tableName());
+        seqRepository.update(seq);
         return id;
     }
 

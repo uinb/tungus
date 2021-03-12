@@ -1,9 +1,9 @@
 package tech.uinb.tungus.codec.fusotao.bean.event;
 
 import tech.uinb.tungus.codec.EventRecord;
-import tech.uinb.tungus.codec.fusotao.type.FusotaoBalanceStatus;
 import io.emeraldpay.polkaj.types.Address;
 import io.emeraldpay.polkaj.types.DotAmount;
+import tech.uinb.tungus.codec.fusotao.type.FusotaoBalanceStatus;
 
 
 //Balances.ReserveRepatriated(AccountId,AccountId,Balance,Status)
