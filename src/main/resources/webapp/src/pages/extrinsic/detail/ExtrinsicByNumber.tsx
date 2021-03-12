@@ -17,7 +17,7 @@
 
 import React, { useState, useMemo } from 'react';
 import useBlock from '@/hooks/useBlock';
-import ExtrinsicPanelByNumber from './ExtrinsicPanelByNumber';
+import ExtrinsicPanel from './ExtrinsicPanel';
 import { Spin } from 'antd';
 import Nodata from '@/components/Nodata';
 import BaseSearch from '@/components/BaseSearch';
@@ -69,7 +69,7 @@ const ExtrinsicByNumber: React.FC<{ extrinsicId: string }> = ({
       </div>
       <Spin spinning={blockLoading} wrapperClassName="user-modal">
         {extrinsic && block ? (
-          <ExtrinsicPanelByNumber
+          <ExtrinsicPanel
             extrinsicId={extrinsicId}
             block={block}
             blockNumber={blockNumber}

@@ -15,29 +15,60 @@
  * limitations under the License.
  */
 
-import React, { useState, useEffect } from 'react';
-import { NavLink, useParams, useIntl } from 'umi';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useParams, useIntl } from 'umi';
 import BaseSearch from '@/components/BaseSearch';
-import Parameters from '@/components/Parameters';
-import { Tabs, Table, Tooltip } from 'antd';
-import { RightOutlined, DownOutlined } from '@ant-design/icons';
+import CallableTable from '@/components/CallableTable';
+import TransferTable from '@/components/TransferTable';
+import { Tabs, Spin, Pagination } from 'antd';
 import CopyText from '@/components/CopyText';
-import { formatTime, formatHash } from '@/utils/commonUtils';
 import Nodata from '@/components/Nodata';
 import { useApi } from '@/context/ApiContext';
+
 import { AccountInfo } from '@polkadot/types/interfaces/system';
-const SuccessIcon = require('@/assets/successful.svg');
-const FailedIcon = require('@/assets/failed.svg');
+import { getAccountData } from '@/api/api';
+
 const UserIcon = require('@/assets/user.svg');
+
 const { TabPane } = Tabs;
+interface IPage {
+  pageSize: number;
+  current: number;
+  total: number;
+}
+interface IDataList {
+  ext: string;
+  events: string;
+  ext1st: string;
+  block: number;
+  extIndex: string;
+}
+interface IData {
+  dataList: IDataList[];
+  total: number;
+}
+
+const defaultPageOptions = {
+  pageSize: 5,
+  current: 1,
+  total: 0,
+};
 const AccountDetail: React.FC = () => {
   const intl = useIntl();
   const { id } = useParams<IRouteParams>();
   const { api } = useApi();
-  const [extrinsicData, setExtrinsicData] = useState<ChainTypes.IExtrinsic[]>(
-    [],
-  );
+  const [callableData, setCallableData] = useState<IData>();
+  const [transferData, setTransferData] = useState<IData>();
+  const [stashData, setStashData] = useState<IData>();
   const [userInfo, setUserInfo] = useState<AccountInfo>();
+  const [activeKey, setActiveKey] = useState<string>('callable');
+  const [pageOptions, setPageOptions] = useState<IPage>(defaultPageOptions);
+  const [loading, setLoading] = useState<boolean>(false);
+  const onTabChange = useCallback((key: string) => {
+    setActiveKey(key);
+    setPageOptions(defaultPageOptions);
+    getSingleList(key, defaultPageOptions);
+  }, []);
   const getUserInfo = async () => {
     if (api) {
       try {
@@ -48,59 +79,78 @@ const AccountDetail: React.FC = () => {
       }
     }
   };
-  const callableColumns = [
-    {
-      title: intl.formatMessage({
-        id: 'callableId',
-      }),
-      dataIndex: 'id',
-      render: (text: string) => {
-        return <NavLink to={'/callable/' + text}>{text}</NavLink>;
-      },
-    },
-    {
-      title: intl.formatMessage({
-        id: 'hash',
-      }),
-      dataIndex: 'hash',
-      render: (text: string) => (
-        <Tooltip title={text} color="#474747">
-          <span>{formatHash(text)}</span>
-        </Tooltip>
-      ),
-    },
-    {
-      title: intl.formatMessage({
-        id: 'time',
-      }),
-      dataIndex: 'time',
-    },
-    {
-      title: intl.formatMessage({
-        id: 'result',
-      }),
-      dataIndex: 'result',
-      render: (text: string) => (
-        <img
-          src={text === 'ExtrinsicSuccess' ? SuccessIcon : FailedIcon}
-          alt=""
-        />
-      ),
-    },
-    {
-      title: intl.formatMessage({
-        id: 'action',
-      }),
-      dataIndex: 'action',
-    },
-  ];
+  const getDataList = (key: string, options?: IPage) => {
+    return new Promise((resolve, reject) => {
+      getAccountData(key, {
+        account: id,
+        page: options ? options.current : pageOptions.current,
+        size: options ? options.pageSize : pageOptions.pageSize,
+      })
+        .then((res) => {
+          const data = {
+            dataList: res.data.list,
+            total: res.data.total,
+          };
+          if (key === 'callable') {
+            setCallableData(data);
+          } else if (key === 'transfer') {
+            setTransferData(data);
+          } else {
+            setStashData(data);
+          }
+          setPageOptions((preOptions) => ({
+            ...preOptions,
+            total: res.data.total,
+          }));
+          resolve(data);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+  };
+  const getSingleList = (type?: string, options?: IPage) => {
+    let key = type ? type : activeKey;
+    setLoading(true);
+    getDataList(key, options).finally(() => {
+      setLoading(false);
+    });
+  };
+  const getAllList = () => {
+    setLoading(true);
+    Promise.all([
+      getDataList('callable'),
+      getDataList('transfer'),
+      getDataList('stash'),
+    ])
+      .then()
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+  const onPageChange = (current: number) => {
+    setPageOptions((preOptions) => {
+      return {
+        ...preOptions,
+        current,
+      };
+    });
+    getSingleList(undefined, {
+      ...pageOptions,
+      current,
+    });
+  };
+
   useEffect(() => {
     getUserInfo();
+  }, [id]);
+  useEffect(() => {
+    getAllList();
   }, [id]);
   return (
     <div className="chain-detail base-container">
       <BaseSearch />
-      {userInfo ? (
+      {userInfo && api ? (
         <>
           <div className="base-card">
             <ul className="block-info">
@@ -122,47 +172,53 @@ const AccountDetail: React.FC = () => {
               </li>
             </ul>
           </div>
-          <div className="base-card">
-            <Tabs className="user-tab">
-              <TabPane
-                tab={`${intl.formatMessage({
-                  id: 'callables',
-                })} (${extrinsicData?.length})`}
-                key="callable"
+          <Spin spinning={loading}>
+            <div className="base-card">
+              <Tabs
+                className="user-tab"
+                activeKey={activeKey}
+                onChange={onTabChange}
               >
-                <Table
-                  className="user-table f14"
-                  columns={callableColumns}
-                  dataSource={extrinsicData}
-                  expandable={{
-                    expandedRowRender: (row) => <Parameters extrinsic={row} />,
-                    expandIcon: ({ expanded, record, onExpand }) => (
-                      <span
-                        className="expand-button"
-                        onClick={(e) => onExpand(record, e)}
-                      >
-                        {expanded ? <DownOutlined /> : <RightOutlined />}
-                      </span>
-                    ),
-                    expandIconColumnIndex: 5,
-                  }}
-                  pagination={false}
-                />
-              </TabPane>
-              <TabPane
-                tab={`${intl.formatMessage({
-                  id: 'transfer',
-                })} (0)`}
-                key="transfer"
-              ></TabPane>
-              <TabPane
-                tab={`${intl.formatMessage({
-                  id: 'stash',
-                })} TAO (0)`}
-                key="stash"
-              ></TabPane>
-            </Tabs>
-          </div>
+                <TabPane
+                  tab={`${intl.formatMessage({
+                    id: 'callables',
+                  })} (${callableData?.total || 0})`}
+                  key="callable"
+                >
+                  {callableData ? (
+                    <CallableTable api={api} dataList={callableData.dataList} />
+                  ) : (
+                    <Nodata />
+                  )}
+                </TabPane>
+                <TabPane
+                  tab={`${intl.formatMessage({
+                    id: 'transfer',
+                  })} (${transferData?.total || 0})`}
+                  key="transfer"
+                >
+                  {transferData ? (
+                    <TransferTable api={api} dataList={transferData.dataList} />
+                  ) : (
+                    <Nodata />
+                  )}
+                </TabPane>
+                <TabPane
+                  tab={`${intl.formatMessage({
+                    id: 'stash',
+                  })} (${stashData?.total || 0})`}
+                  key="stash"
+                ></TabPane>
+              </Tabs>
+            </div>
+          </Spin>
+          <Pagination
+            className="user-pagination"
+            {...pageOptions}
+            showSizeChanger={false}
+            onChange={onPageChange}
+            hideOnSinglePage={false}
+          />
         </>
       ) : (
         <Nodata />
@@ -170,4 +226,4 @@ const AccountDetail: React.FC = () => {
     </div>
   );
 };
-export default AccountDetail;
+export default React.memo(AccountDetail);

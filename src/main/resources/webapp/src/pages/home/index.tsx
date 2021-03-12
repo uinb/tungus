@@ -19,31 +19,13 @@ import React, { FC, useContext } from 'react';
 import { Table } from 'antd';
 import BaseSearch from '@/components/BaseSearch';
 import BlockList from './BlockList';
+import TransferList from './TransferList';
 import { useIntl, NavLink } from 'umi';
-import { useApi } from '@/context/ApiContext';
 import FinalizedContext from '@/context/FinalizedContext';
 import { formatNumber } from '@/utils/commonUtils';
 import './index.less';
 
-interface ITransferProps {
-  index: string;
-  from: string;
-  to: string;
-  amount: number;
-  timeStamp: number;
-}
-interface IStashProps {
-  account: string;
-  dominator: string;
-  amount: number;
-  block: number;
-}
-interface IPledgeProps {
-  account: string;
-  amount: number;
-  block: number;
-}
-const Main: FC = () => {
+const Home: FC = () => {
   const intl = useIntl();
   const finalizedHeader = useContext(FinalizedContext);
   const stashColumns = [
@@ -84,10 +66,12 @@ const Main: FC = () => {
   return (
     <div className="home">
       <section className="search-area">
-        <h2>FUSOSCAN</h2>
-        <BaseSearch split2={true} />
+        <div className="base-container">
+          <h2>FUSOSCAN</h2>
+          <BaseSearch split2={true} />
+        </div>
       </section>
-      <section className="total-area">
+      <section className="total-area base-container">
         <div className="total-card">
           <img src={require('../../assets/final_block.svg')} alt="" />
           <div>
@@ -117,8 +101,8 @@ const Main: FC = () => {
           </div>
         </div>
       </section>
-      <section className="detail-area">
-        <div className="detail-card">
+      <section className="detail-area base-container">
+        <div className="detail-card block-list">
           <header>
             <div className="title">
               <img src={require('../../assets/stash.svg')} alt="" />
@@ -130,36 +114,17 @@ const Main: FC = () => {
           </header>
           <BlockList />
         </div>
-        <div className="detail-card">
+        <div className="detail-card transfer-list">
           <header>
             <div className="title">
               <img src={require('../../assets/transfer.svg')} alt="" />
               <span>{intl.formatMessage({ id: 'transfers' })}</span>
             </div>
-            <NavLink to="/callable">
+            <NavLink to="/callable?type=transfer">
               {intl.formatMessage({ id: 'viewAll' })}
             </NavLink>
           </header>
-          <ul>
-            <li>
-              <div className="left">
-                <div className="top">
-                  <span>Index#</span>
-                  <span className="underline">123-1</span>
-                </div>
-                <div className="bottom">
-                  <span className="keyword">From</span>
-                  <span className="underline">1qweasdasdaweqw</span>
-                  <span className="keyword">To</span>
-                  <span className="underline">1assdfasdfsdfsd</span>
-                </div>
-              </div>
-              <div className="right">
-                <h5>3 secs ago</h5>
-                <h4>123.9999 TAO</h4>
-              </div>
-            </li>
-          </ul>
+          <TransferList />
         </div>
         <div className="detail-card">
           <header>
@@ -167,23 +132,18 @@ const Main: FC = () => {
               <img src={require('../../assets/logo_square.svg')} alt="" />
               <span>{intl.formatMessage({ id: 'stash' })} TAO</span>
             </div>
-            <NavLink to="/callable">
+            <NavLink to="/callable?type=stash">
               {intl.formatMessage({ id: 'viewAll' })}
             </NavLink>
           </header>
-          <main
-            style={{
-              marginTop: '16px',
-              padding: '0 24px',
-            }}
-          >
+          <div className="base-container" style={{ marginTop: '16px' }}>
             <Table
               columns={stashColumns}
               dataSource={[]}
               pagination={false}
               className="user-table"
-            ></Table>
-          </main>
+            />
+          </div>
         </div>
         <div className="detail-card">
           <header>
@@ -191,14 +151,14 @@ const Main: FC = () => {
               <img src={require('../../assets/logo_square.svg')} alt="" />
               <span>{intl.formatMessage({ id: 'pledge' })} TAO</span>
             </div>
-            <NavLink to="/callable">
+            <NavLink to="/callable?type=pledge">
               {intl.formatMessage({ id: 'viewAll' })}
             </NavLink>
           </header>
-          <main
+          <div
+            className="base-container"
             style={{
               marginTop: '16px',
-              padding: '0 24px',
             }}
           >
             <Table
@@ -206,15 +166,12 @@ const Main: FC = () => {
               dataSource={[]}
               pagination={false}
               className="user-table"
-            ></Table>
-          </main>
+            />
+          </div>
         </div>
       </section>
     </div>
   );
 };
-const Home: FC = (props) => {
-  const { api } = useApi();
-  return api ? <Main {...props} /> : null;
-};
+
 export default Home;

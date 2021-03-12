@@ -16,23 +16,29 @@
  */
 
 import React from 'react';
-import { Table, Pagination } from 'antd';
+import { Table, Pagination, Spin } from 'antd';
 import BaseSearch from './BaseSearch';
 import './baseTable.less';
 interface IBaseTable {
   columns: any[];
   data?: any[];
+  total?: number;
   type: 'block' | 'extrinsic' | 'account';
   showSearch?: boolean;
   showTable?: boolean;
+  loading: boolean;
   onPageChange?: (page: number, pageSize?: number) => void;
+  rowKey: string;
 }
 const Main: React.FC<IBaseTable> = ({
   columns,
   data,
+  total,
   showSearch = true,
   showTable = true,
   onPageChange,
+  loading,
+  rowKey,
 }) => {
   return (
     <div className="block">
@@ -40,16 +46,19 @@ const Main: React.FC<IBaseTable> = ({
       {showTable ? (
         <>
           <main>
-            <Table
-              columns={columns}
-              dataSource={data}
-              pagination={false}
-              className="user-table"
-            ></Table>
+            <Spin spinning={loading}>
+              <Table
+                rowKey={rowKey}
+                columns={columns}
+                dataSource={data}
+                pagination={false}
+                className="user-table"
+              ></Table>
+            </Spin>
           </main>
           <Pagination
             className="user-pagination"
-            total={data?.length}
+            total={total}
             showSizeChanger={false}
             onChange={onPageChange}
             hideOnSinglePage={true}

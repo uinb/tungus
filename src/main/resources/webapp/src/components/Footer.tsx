@@ -21,10 +21,10 @@ const Footer = () => {
     <div className="footer">
       <img src={require('../assets/logo.svg')} alt="" />
       <h3 className="copyright">@2021-2022 FUSO Scan</h3>
-      <nav>
+      <nav className="base-container">
         <a href="#">Home</a>
         <a href="#">Chain</a>
-        <a href="#">Acccounts</a>
+        <a href="#">Accounts</a>
         <a href="#">Analytics</a>
         <a href="#">Runtime</a>
       </nav>

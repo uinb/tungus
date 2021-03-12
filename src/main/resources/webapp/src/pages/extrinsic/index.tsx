@@ -24,7 +24,7 @@ const Block: React.FC = (props) => {
   const intl = useIntl();
   const location = useLocation();
   const type = (location as any).query.type;
-  const typeColumns = useMemo(() => {
+  const typeColumns: any = useMemo(() => {
     return {
       default: [
         {
@@ -114,12 +114,38 @@ const Block: React.FC = (props) => {
           dataIndex: 'hash',
         },
       ],
+      stash: [
+        {
+          title: intl.formatMessage({
+            id: 'stashAccount',
+          }),
+          dataIndex: 'account',
+        },
+        {
+          title: intl.formatMessage({
+            id: 'dominator',
+          }),
+          dataIndex: 'dominator',
+        },
+        {
+          title: intl.formatMessage({
+            id: 'amount',
+          }),
+          dataIndex: 'amount',
+        },
+        {
+          title: intl.formatMessage({
+            id: 'block',
+          }),
+          dataIndex: 'block',
+        },
+      ],
     };
   }, [intl]);
   return (
     <BaseTable
       {...props}
-      columns={typeColumns.default}
+      columns={typeColumns[type] ? typeColumns[type] : typeColumns.default}
       type={type}
       showTable={type === undefined || typeList.includes(type)}
     />

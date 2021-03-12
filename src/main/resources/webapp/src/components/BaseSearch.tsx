@@ -65,6 +65,8 @@ const BaseSearch: React.FC<ISearchProps> = ({
             history.push('/callable/' + key);
           } else if (type === 'block') {
             history.push('/block/' + key);
+          } else if (type === 'account') {
+            history.push('/account/' + key);
           }
         }
       });
@@ -147,12 +149,7 @@ const BaseSearch: React.FC<ISearchProps> = ({
         ></div>
       ) : null}
 
-      <Button
-        onClick={handleSearch}
-        style={{
-          borderRadius: !split2 ? '0 4px 4px 0' : '4px',
-        }}
-      >
+      <Button onClick={handleSearch}>
         <SearchOutlined
           style={{
             color: '#fff',

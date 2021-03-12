@@ -38,8 +38,8 @@ export const formatTime = (spaceTime: number) => {
   }
   return tempArr.slice(0, 2).join(' ') + 'ago';
 };
-export const formatHash = (hash: string) => {
-  return hash.replace(/(.{7})(.*)(.{5})/g, '$1....$3');
+export const formatHash = (hash?: string) => {
+  return hash ? hash.replace(/(.{7})(.*)(.{5})/g, '$1....$3') : '';
 };
 export const formatNumber = (num?: number) => {
   if (num === undefined) {

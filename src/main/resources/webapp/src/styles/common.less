@@ -16,17 +16,17 @@ body {
 #root > main {
   min-height: calc(100% - 250px);
 }
-a {
-  &.underline {
-    text-decoration: underline;
-  }
-  &.yellow {
-    color: @yellow2;
+
+a.yellow {
+  color: @yellow1;
+  &:hover {
+    color: @yellow1;
   }
 }
 p {
   margin: 0;
 }
+
 .title {
   color: red;
 }
@@ -188,7 +188,7 @@ p {
   .ant-table {
     background-color: transparent;
     color: @fontColor3;
-    font-size: 12px;
+    font-size: 14px;
   }
   .ant-table-thead > tr > th {
     background: transparent;
@@ -512,5 +512,13 @@ div.with-padding > span {
   .base-container {
     width: 100%;
     padding: 0 16px;
+  }
+}
+
+.underline {
+  text-decoration: underline;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
   }
 }
