@@ -96,6 +96,24 @@ create table t_ext_event_0
     key (ext_id)
 );
 
+create table t_stash_ext_0
+(
+    id     bigint primary key,
+    ext_id bigint not null
+);
+
+create table t_transfer_ext_0
+(
+    id     bigint primary key,
+    ext_id bigint not null
+);
+
+create table t_pledge_ext_0
+(
+    id     bigint primary key,
+    ext_id bigint not null
+);
+
 insert into t_seq (prefix, value)
 values ('t_block_header', 0);
 insert into t_seq (prefix, value)
@@ -106,6 +124,12 @@ insert into t_seq (prefix, value)
 values ('t_account', 0);
 insert into t_seq (prefix, value)
 values ('t_event', 0);
+insert into t_seq (prefix, value)
+values ('t_stash_ext', 0);
+insert into t_seq (prefix, value)
+values ('t_transfer_ext', 0);
+insert into t_seq (prefix, value)
+values ('t_pledge_ext', 0);
 
 insert into t_table_meta (prefix, version, splitting)
 values ('t_block_header', 1, false);
@@ -127,6 +151,12 @@ insert into t_table_meta (prefix, version, splitting)
 values ('t_event', 1, false);
 insert into t_table_meta (prefix, version, splitting)
 values ('t_ext_event', 1, false);
+insert into t_table_meta (prefix, version, splitting)
+values ('t_stash_ext', 1, false);
+insert into t_table_meta (prefix, version, splitting)
+values ('t_transfer_ext', 1, false);
+insert into t_table_meta (prefix, version, splitting)
+values ('t_pledge_ext', 1, false);
 
 insert into t_table_detail(prefix, suffix, backend, min, max, state)
 values ('t_block_header', 0, null, 0, 0x7fffffffffffffff, 'NORMAL');
@@ -148,3 +178,9 @@ insert into t_table_detail(prefix, suffix, backend, min, max, state)
 values ('t_event', 0, null, 0, 0x7fffffffffffffff, 'NORMAL');
 insert into t_table_detail(prefix, suffix, backend, min, max, state)
 values ('t_ext_event', 0, null, 0, 0x7fffffffffffffff, 'NORMAL');
+insert into t_table_detail(prefix, suffix, backend, min, max, state)
+values ('t_stash_ext', 0, null, 0, 0x7fffffffffffffff, 'NORMAL');
+insert into t_table_detail(prefix, suffix, backend, min, max, state)
+values ('t_transfer_ext', 0, null, 0, 0x7fffffffffffffff, 'NORMAL');
+insert into t_table_detail(prefix, suffix, backend, min, max, state)
+values ('t_pledge_ext', 0, null, 0, 0x7fffffffffffffff, 'NORMAL');

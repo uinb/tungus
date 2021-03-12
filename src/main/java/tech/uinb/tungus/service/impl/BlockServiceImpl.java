@@ -82,6 +82,12 @@ public class BlockServiceImpl implements BlockService {
     private EventDataService eventDataService;
     @Autowired
     private ExtrinsicEventService extrinsicEventService;
+    @Autowired
+    private StashExtService stashExtService;
+    @Autowired
+    private TransferExtService transferExtService;
+    @Autowired
+    private PledgeExtService pledgeExtService;
 
     private LongSeqSplitter headerSplitter;
     private LongSeqSplitter digestLogSplitter;
@@ -195,15 +201,13 @@ public class BlockServiceImpl implements BlockService {
 
     @Override
     public BlockHeader getBlockHeaderById(long id) {
-        Splitter splitter = new LongHashSplitter(tableMetaService.getByPrefix(TableMetaService.BLOCK_HEADER));
-        var table = splitter.computeTable(id);
+        var table = headerSplitter.computeTable(id);
         return blockHeaderRepository.queryByBlockId(id, table.tableName());
     }
 
     @Override
     public Ext getExtById(long id) {
-        Splitter splitter = new LongHashSplitter(tableMetaService.getByPrefix(TableMetaService.EXTRINSICS));
-        var table = splitter.computeTable(id);
+        var table = extrinsicSplitter.computeTable(id);
         return extRepository.queryExtId(id, table.tableName());
     }
 
@@ -271,6 +275,8 @@ public class BlockServiceImpl implements BlockService {
             FusotaoBalancesTransfer balance = (FusotaoBalancesTransfer) ext.getCall();
             var destination = balance.getDest();
             save(destination.toString(), id);
+
+            transferExtService.save(id);
         }
 
         private void save(String account, long id) {
@@ -289,6 +295,8 @@ public class BlockServiceImpl implements BlockService {
             FusotaoBalancesTransferKeepAlive balance = (FusotaoBalancesTransferKeepAlive) ext.getCall();
             var destination = balance.getDest();
             save(destination.toString(), id);
+
+            transferExtService.save(id);
         }
 
         private void save(String account, long id) {
@@ -303,6 +311,8 @@ public class BlockServiceImpl implements BlockService {
             var tx = ext.getTx();
             var sender = tx.getSender();
             save(sender.toString(), id);
+
+            stashExtService.save(id);
         }
 
         private void save(String account, long id) {

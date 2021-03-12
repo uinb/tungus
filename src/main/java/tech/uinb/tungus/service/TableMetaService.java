@@ -14,6 +14,9 @@ public interface TableMetaService {
     String BLOCK_EXTRINSIC = "t_block_extrinsic";
     String EVENT = "t_event";
     String EXTRINSIC_EVENT = "t_ext_event";
+    String STASH_EXTRINSIC = "t_stash_ext";
+    String PLEDGE_EXTRINSIC = "t_pledge_ext";
+    String TRANSFER_EXTRINSIC = "t_transfer_ext";
 
     TableMeta getByPrefix(String prefix);
 }

@@ -67,4 +67,15 @@ public abstract class AbstractSplitter<T> implements Splitter<T> {
             }
         }
     }
+
+    @Override
+    public TableDetail getBySuffix(int suffix) {
+        for (TableDetail detail : meta.getDetails()) {
+            if (detail.getSuffix() == suffix) {
+                return detail;
+            }
+        }
+
+        throw new IllegalArgumentException("suffix " + suffix + " is not exists");
+    }
 }
