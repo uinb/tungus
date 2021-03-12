@@ -3,7 +3,6 @@ package tech.uinb.tungus.codec.fusotao.bean.event;
 import tech.uinb.tungus.codec.EventRecord;
 import tech.uinb.tungus.codec.fusotao.type.DispatchInfo;
 
-
 //System.ExtrinsicSuccess(DispatchInfo)
 public class FusotaoSystemExtrinsicSuccess extends EventRecord {
 	private DispatchInfo param0;

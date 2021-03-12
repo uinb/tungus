@@ -3,8 +3,9 @@ package tech.uinb.tungus.codec.fusotao.writer.event;
 import io.emeraldpay.polkaj.scale.ScaleCodecWriter;
 import io.emeraldpay.polkaj.scale.ScaleWriter;
 import tech.uinb.tungus.codec.fusotao.bean.event.FusotaoGrandpaNewAuthorities;
-import java.io.IOException;
 import tech.uinb.tungus.codec.fusotao.type.writer.AuthorityListWriter;
+
+import java.io.IOException;
 
 public class FusotaoGrandpaNewAuthoritiesWriter implements ScaleWriter<FusotaoGrandpaNewAuthorities> {
 	@Override

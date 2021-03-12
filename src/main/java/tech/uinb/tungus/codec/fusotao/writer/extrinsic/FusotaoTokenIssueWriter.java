@@ -4,7 +4,7 @@ import io.emeraldpay.polkaj.scale.ScaleCodecWriter;
 import io.emeraldpay.polkaj.scale.ScaleWriter;
 import tech.uinb.tungus.codec.fusotao.bean.extrinsic.FusotaoTokenIssue;
 import java.io.IOException;
-
+import io.emeraldpay.polkaj.scale.ScaleCodecWriter;
 import io.emeraldpay.polkaj.scale.writer.ListWriter;
 
 public class FusotaoTokenIssueWriter implements ScaleWriter<FusotaoTokenIssue> {

@@ -3,6 +3,7 @@ package tech.uinb.tungus.codec.fusotao.reader.extrinsic;
 import tech.uinb.tungus.codec.fusotao.bean.extrinsic.FusotaoReceiptsClaimDominator;
 import io.emeraldpay.polkaj.scale.ScaleCodecReader;
 import io.emeraldpay.polkaj.scale.ScaleReader;
+import io.emeraldpay.polkaj.scaletypes.Metadata;
 import io.emeraldpay.polkaj.types.DotAmount;
 
 public class FusotaoReceiptsClaimDominatorReader implements ScaleReader<FusotaoReceiptsClaimDominator> {
