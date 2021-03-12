@@ -10,6 +10,7 @@ create table t_block_header_0
     blk_id         bigint primary key,
     number         bigint not null,
     extrinsics     varchar(128),
+    hash           varchar(128),
     parent_hash    varchar(128),
     state_root     varchar(128),
     create_time    bigint,

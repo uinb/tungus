@@ -1,5 +1,6 @@
 package tech.uinb.tungus.service;
 
+import java.util.List;
 import tech.uinb.tungus.codec.EventWriter;
 import tech.uinb.tungus.codec.EventsReader;
 import tech.uinb.tungus.codec.GeneralExtrinsicReader;
@@ -31,4 +32,6 @@ public interface BlockService {
     BlockHeader getBlockHeaderById(long id);
 
     Ext getExtById(long id);
+
+    List<BlockHeader> getBlockByIds(List<Long> ids);
 }

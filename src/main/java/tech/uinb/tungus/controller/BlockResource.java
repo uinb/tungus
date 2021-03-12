@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import tech.uinb.tungus.codec.EventRecord;
 import tech.uinb.tungus.codec.EventWriter;
 import tech.uinb.tungus.config.Constants;
+import tech.uinb.tungus.entity.BlockHeader;
 import tech.uinb.tungus.entity.Ext;
 import tech.uinb.tungus.entity.HashIdMap;
 import tech.uinb.tungus.entity.po.AccountScanPO;
@@ -105,9 +106,11 @@ public class BlockResource {
     @PostMapping("/scan/{type}")
     public ResponseEntity scan(@PathVariable String type,@RequestBody AccountScanPO accountScanPO)
         throws IOException {
-        HashIdMap hashIdMap = hashIdMapService.getByHash(accountScanPO.getAccount());
-        if (hashIdMap == null || hashIdMap.getType() != ACCOUNT || !accountScanPO.check()){
+        if (!accountScanPO.check()){
             return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }
+        HashIdMap hashIdMap = hashIdMapService.getByHash(accountScanPO.getAccount());
+        if (hashIdMap == null || hashIdMap.getType() != ACCOUNT){
         }
         List<Long> extIds = new ArrayList<>();
         switch (type){
@@ -124,14 +127,9 @@ public class BlockResource {
                 return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
         List result = new ArrayList<>();
-
-        long t1 = System.currentTimeMillis();
-
-
         for (int i = 0; i < extIds.size(); i++) {
             if (accountScanPO.getSize()*(accountScanPO.getPage()-1) <= i && i < accountScanPO.getSize()*(accountScanPO.getPage())){
                 Ext ext = blockService.getExtById(extIds.get(i));
-                long tt1 = System.currentTimeMillis();
 
                 List<EventRecord> events = new ArrayList();
                 List<Long> list = extrinsicEventService.getEventIdByExtId(ext.getId());
@@ -144,8 +142,6 @@ public class BlockResource {
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 listWriter.write(new ScaleCodecWriter(out),events);
 
-                long tt2 = System.currentTimeMillis();
-
                 result.add(Map.of(
                     "ext1st",new ByteData(ext_1st.getData()).toString(),
                     "ext",new ByteData(ext.getData()).toString(),
@@ -153,10 +149,8 @@ public class BlockResource {
                     "events",new ByteData(out.toByteArray()).toString(),
                     "block",blockExtService.getBlockIdByExtId(extIds.get(i))
                 ));
-                System.out.println(tt2-tt1+":耗时");
             }
         }
-        System.out.println(System.currentTimeMillis()-t1);
         return new ResponseEntity(PageDataVO.valueOf(result,accountScanPO.getPage(),accountScanPO.getSize(),extIds.size()),HttpStatus.OK);
     }
 
@@ -167,15 +161,20 @@ public class BlockResource {
         switch (type){
             case Constants.TYPE_BLOCK:
                 var lastNumber = blockService.lastBlockNumber();
+                List list = new ArrayList();
                 for (long i = lastNumber-pagePO.getSize()*(pagePO.getPage()-1); i > lastNumber-pagePO.getSize()*(pagePO.getPage()); i--) {
-                    var blockHeader = blockService.getBlockHeaderById(i);
-
-
+                    list.add(i);
                 }
+                var blockHeaders = blockService.getBlockByIds(list);
+                pageDataVO = PageDataVO.valueOf(blockHeaders,pagePO.getPage(),pagePO.getSize(),lastNumber);
                 break;
             case Constants.TYPE_TRANSFER:
+
+
+
                 break;
             case Constants.TYPE_STASH:
+
                 break;
             default:
                 return new ResponseEntity(HttpStatus.NO_CONTENT);
