@@ -3,6 +3,7 @@ package tech.uinb.tungus.codec.fusotao.reader.event;
 import tech.uinb.tungus.codec.fusotao.bean.event.FusotaoReceiptsTokenDominatorClaimed;
 import io.emeraldpay.polkaj.scale.ScaleCodecReader;
 import io.emeraldpay.polkaj.scale.ScaleReader;
+import io.emeraldpay.polkaj.scaletypes.Metadata;
 import io.emeraldpay.polkaj.ss58.SS58Type;
 import io.emeraldpay.polkaj.types.Hash256;
 import io.emeraldpay.polkaj.types.Address;

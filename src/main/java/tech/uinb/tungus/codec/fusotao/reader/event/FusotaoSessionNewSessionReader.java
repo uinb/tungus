@@ -3,6 +3,7 @@ package tech.uinb.tungus.codec.fusotao.reader.event;
 import tech.uinb.tungus.codec.fusotao.bean.event.FusotaoSessionNewSession;
 import io.emeraldpay.polkaj.scale.ScaleCodecReader;
 import io.emeraldpay.polkaj.scale.ScaleReader;
+import io.emeraldpay.polkaj.scaletypes.Metadata;
 
 public class FusotaoSessionNewSessionReader implements ScaleReader<FusotaoSessionNewSession> {
 	@Override

@@ -6,4 +6,6 @@ public interface Splitter<T> {
     void split();
 
     TableDetail computeTable(T key);
+
+    TableDetail getBySuffix(int suffix);
 }

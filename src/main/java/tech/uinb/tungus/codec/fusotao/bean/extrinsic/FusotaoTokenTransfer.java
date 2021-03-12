@@ -6,7 +6,7 @@ import io.emeraldpay.polkaj.types.Address;
 import io.emeraldpay.polkaj.types.DotAmount;
 
 
-//Token.Transfer(token:<T as Trait>::TokenId,target:<T::Lookup as StaticLookup>::Source,amount:Compact<T::Balance>)
+//Token.Transfer(token:T::TokenId,target:<T::Lookup as StaticLookup>::Source,amount:Compact<T::Balance>)
 public class FusotaoTokenTransfer extends ExtrinsicCall {
 	private Hash256 Token;
 	private Address Target;

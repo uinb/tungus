@@ -4,9 +4,9 @@ import tech.uinb.tungus.codec.fusotao.bean.event.FusotaoBalancesReserveRepatriat
 import io.emeraldpay.polkaj.scale.ScaleCodecReader;
 import io.emeraldpay.polkaj.scale.ScaleReader;
 import io.emeraldpay.polkaj.ss58.SS58Type;
-import tech.uinb.tungus.codec.fusotao.type.FusotaoBalanceStatus;
 import io.emeraldpay.polkaj.types.Address;
 import io.emeraldpay.polkaj.types.DotAmount;
+import tech.uinb.tungus.codec.fusotao.type.FusotaoBalanceStatus;
 
 public class FusotaoBalancesReserveRepatriatedReader implements ScaleReader<FusotaoBalancesReserveRepatriated> {
 	@Override

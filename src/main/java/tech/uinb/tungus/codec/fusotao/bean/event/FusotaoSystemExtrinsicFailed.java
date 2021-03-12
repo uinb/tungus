@@ -4,7 +4,6 @@ import tech.uinb.tungus.codec.EventRecord;
 import tech.uinb.tungus.codec.fusotao.type.DispatchError;
 import tech.uinb.tungus.codec.fusotao.type.DispatchInfo;
 
-
 //System.ExtrinsicFailed(DispatchError,DispatchInfo)
 public class FusotaoSystemExtrinsicFailed extends EventRecord {
 	private DispatchError param0;

@@ -12,10 +12,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,20 +27,16 @@ import tech.uinb.tungus.config.Constants;
 import tech.uinb.tungus.entity.BlockHeader;
 import tech.uinb.tungus.entity.Ext;
 import tech.uinb.tungus.entity.HashIdMap;
+import tech.uinb.tungus.entity.TransferExt;
 import tech.uinb.tungus.entity.po.AccountScanPO;
 import tech.uinb.tungus.entity.po.PagePO;
 import tech.uinb.tungus.entity.vo.PageDataVO;
-import tech.uinb.tungus.service.AccountExtrinsicService;
-import tech.uinb.tungus.service.AccountStashService;
-import tech.uinb.tungus.service.AccountTransactionService;
-import tech.uinb.tungus.service.BlockExtService;
-import tech.uinb.tungus.service.BlockService;
-import tech.uinb.tungus.service.EventDataService;
-import tech.uinb.tungus.service.ExtrinsicEventService;
-import tech.uinb.tungus.service.HashIdMapService;
+import tech.uinb.tungus.service.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import tech.uinb.tungus.service.impl.ScheduleServiceImpl;
 
 /**
@@ -68,42 +66,48 @@ public class BlockResource {
     private ExtrinsicEventService extrinsicEventService;
     @Autowired
     private EventDataService eventDataService;
+    @Autowired
+    private TransferExtService transferExtService;
 
     @ApiOperation(value = "search", httpMethod = "GET")
     @GetMapping("/search/{hash}")
-    public ResponseEntity search(@PathVariable String hash){
+    public ResponseEntity search(@PathVariable String hash) {
         HashIdMap hashIdMap = hashIdMapService.getByHash(hash);
-        if (hashIdMap == null){
-            if (StringUtils.isNumeric(hash)){
+        if (hashIdMap == null) {
+            if (StringUtils.isNumeric(hash)) {
                 hashIdMap = hashIdMapService.getByBlockNumber(Long.valueOf(hash));
             }
         }
-        if (hashIdMap != null){
+        if (hashIdMap != null) {
             Map resultMap = new HashMap();
-            switch (hashIdMap.getType()){
+            switch (hashIdMap.getType()) {
                 case BLOCK:
                     resultMap.put("type", Constants.TYPE_BLOCK);
-                    resultMap.put("hash",hashIdMap.getHash());
+                    resultMap.put("hash", hashIdMap.getHash());
                     break;
                 case EXTRINSICS:
                     Ext ext = blockService.getExtById(hashIdMap.getId());
                     String index = blockExtService.getExtIndexInBlockByExtId(ext.getId());
-                    resultMap.put("data",new ByteData(ext.getData()).toString());
-                    resultMap.put("type",Constants.TYPE_CALLABLE);
-                    resultMap.put("index",index);
+                    resultMap.put("data", new ByteData(ext.getData()).toString());
+                    resultMap.put("type", Constants.TYPE_CALLABLE);
+                    resultMap.put("index", index);
                     break;
                 case ACCOUNT:
-                    resultMap.put("type",Constants.TYPE_ACCOUNT);
+                    resultMap.put("type", Constants.TYPE_ACCOUNT);
                     break;
             }
-            return new ResponseEntity(resultMap,HttpStatus.OK);
-        }else {
+            return new ResponseEntity(resultMap, HttpStatus.OK);
+        } else {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
     }
 
     @ApiOperation(value = "scan", httpMethod = "POST")
     @PostMapping("/scan/{type}")
+    public ResponseEntity scan(@PathVariable String type, @RequestBody AccountScanPO accountScanPO)
+            throws IOException {
+        HashIdMap hashIdMap = hashIdMapService.getByHash(accountScanPO.getAccount());
+        if (hashIdMap == null || hashIdMap.getType() != ACCOUNT || !accountScanPO.check()) {
     public ResponseEntity scan(@PathVariable String type,@RequestBody AccountScanPO accountScanPO)
         throws IOException {
         if (!accountScanPO.check()){
@@ -113,7 +117,7 @@ public class BlockResource {
         if (hashIdMap == null || hashIdMap.getType() != ACCOUNT){
         }
         List<Long> extIds = new ArrayList<>();
-        switch (type){
+        switch (type) {
             case Constants.TYPE_CALLABLE:
                 extIds = accountExtrinsicService.getExtIdsByAccount(hashIdMap.getId());
                 break;
@@ -149,38 +153,43 @@ public class BlockResource {
                     "events",new ByteData(out.toByteArray()).toString(),
                     "block",blockExtService.getBlockIdByExtId(extIds.get(i))
                 ));
+                System.out.println(tt2-tt1+":耗时");
             }
         }
+        System.out.println(System.currentTimeMillis()-t1);
         return new ResponseEntity(PageDataVO.valueOf(result,accountScanPO.getPage(),accountScanPO.getSize(),extIds.size()),HttpStatus.OK);
     }
 
     @ApiOperation(value = "record", httpMethod = "POST")
     @PostMapping("/record/{type}")
-    public ResponseEntity record(@PathVariable String type,@RequestBody PagePO pagePO){
+    public ResponseEntity record(@PathVariable String type, @RequestBody PagePO pagePO) {
         PageDataVO pageDataVO = null;
-        switch (type){
+        switch (type) {
             case Constants.TYPE_BLOCK:
                 var lastNumber = blockService.lastBlockNumber();
                 List list = new ArrayList();
                 for (long i = lastNumber-pagePO.getSize()*(pagePO.getPage()-1); i > lastNumber-pagePO.getSize()*(pagePO.getPage()); i--) {
                     list.add(i);
                 }
-                var blockHeaders = blockService.getBlockByIds(list);
-                pageDataVO = PageDataVO.valueOf(blockHeaders,pagePO.getPage(),pagePO.getSize(),lastNumber);
                 break;
             case Constants.TYPE_TRANSFER:
-
-
-
                 break;
             case Constants.TYPE_STASH:
-
                 break;
             default:
                 return new ResponseEntity(HttpStatus.NO_CONTENT);
 
         }
         return new ResponseEntity(pageDataVO,HttpStatus.OK);
+    }
+
+    public ResponseEntity getTransfer(PagePO pageable) {
+        var page = transferExtService.query(pageable);
+        List<Ext> data = page.getList().stream()
+                .map(item -> blockService.getExtById(item.getId()))
+                .collect(Collectors.toList());
+        var result = PageDataVO.valueOf(data, pageable.getPage(), pageable.getSize(), page.getTotal());
+        return new ResponseEntity(result, HttpStatus.OK);
     }
 
 //    @ApiOperation(value = "statistics", httpMethod = "GET")
