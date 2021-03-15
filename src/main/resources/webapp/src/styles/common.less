@@ -13,10 +13,17 @@ html,
 body {
   background-color: #171717;
 }
-#root > main {
-  min-height: calc(100% - 250px);
+#root {
+  min-width: 1200px;
+  height: 100%;
+  > main {
+    min-height: calc(100% - 250px);
+  }
 }
-
+.base-container {
+  margin: 0 auto;
+  width: 1200px;
+}
 a.yellow {
   color: @yellow1;
   &:hover {
@@ -79,7 +86,7 @@ p {
   }
   button {
     width: 56px;
-    background-color: #ca1a20;
+    background-color: @red1;
     cursor: pointer;
     font-size: 18px;
   }
@@ -311,52 +318,6 @@ p {
   }
 }
 
-.user-tab.ant-tabs {
-  color: @white;
-  font-weight: 500;
-  .ant-tabs-nav .ant-tabs-nav-wrap,
-  div > .ant-tabs-nav .ant-tabs-nav-wrap {
-    padding-left: 0;
-  }
-  .ant-tabs-tab {
-    padding: 12px;
-    &:hover {
-      color: @white;
-    }
-  }
-  .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
-    color: @white;
-  }
-  .ant-tabs-tab-btn {
-    transition: none;
-  }
-  .ant-tabs-ink-bar {
-    background-color: @red1;
-  }
-  &.ant-tabs-top > .ant-tabs-nav .ant-tabs-ink-bar {
-    height: 3px;
-  }
-  &.ant-tabs-top > .ant-tabs-nav::before {
-    border-bottom: 1px solid @borderColor1;
-  }
-  .ant-tabs-tab-btn:focus,
-  .ant-tabs-tab-remove:focus,
-  .ant-tabs-tab-btn:active,
-  .ant-tabs-tab-remove:active {
-    color: #fff;
-  }
-}
-
-.ant-menu.ant-menu-horizontal {
-  .ant-menu-item a {
-    color: #929299;
-  }
-  .ant-menu-item-selected a,
-  > .ant-menu-item a:hover {
-    color: #fff;
-  }
-}
-
 .expand-button {
   display: flex;
   align-items: center;
@@ -402,7 +363,8 @@ p {
 
 div.with-padding {
   padding: 16px;
-  background-color: #343434;
+  background-color: #212121;
+  border: 1px solid #4a4a4a;
 }
 div.with-padding > span {
   display: block;
@@ -439,14 +401,16 @@ div.with-padding > span {
   background-color: #000;
 }
 .chain-detail {
-  width: 1200px;
   margin: 36px auto;
   img {
     width: 24px;
   }
-  > .search-bar {
+  > .search-area {
     margin-bottom: 32px;
     color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     > div {
       span {
         font-weight: bold;
@@ -498,13 +462,40 @@ div.with-padding > span {
   }
 }
 
-#root {
-  min-width: 1200px;
+.base-menu {
+  color: #bdbdbd;
+  font-size: 16px;
+  transition: all 0.5s linear;
+  overflow: hidden;
+  > li {
+    padding-left: 24px;
+  }
+  header {
+    line-height: 48px;
+  }
 }
-.base-container {
-  margin: 0 auto;
-  width: 1200px;
+.base-menu-item.selected {
+  transition: all 0.5s;
+  background-color: @red1;
+  color: #fff;
 }
+.base-submenu {
+  > header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    .anticon {
+      margin-right: 24px;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.5s;
+    }
+  }
+  .base-menu {
+    font-size: 14px;
+  }
+}
+/** screen media */
 @media screen and (max-width: 786px) {
   #root {
     min-width: unset;
@@ -512,6 +503,65 @@ div.with-padding > span {
   .base-container {
     width: 100%;
     padding: 0 16px;
+  }
+  .base-card {
+    padding: 8px 16px;
+  }
+  .chain-detail {
+    margin: 0;
+  }
+  .user-table {
+    overflow: auto;
+    table {
+      width: 800px;
+    }
+    .ant-table-container table > thead > tr:first-child th:first-child {
+      padding-left: 12px;
+    }
+    .ant-table-tbody > tr > td:first-child {
+      padding-left: 12px;
+    }
+  }
+  .chain-detail {
+    .block-info {
+      > li {
+        position: relative;
+        padding: 8px 0;
+        flex-direction: column;
+        align-items: flex-start;
+        word-break: break-all;
+        > span {
+          margin-top: 8px;
+        }
+        .copy-suffix {
+          position: absolute;
+          right: 0;
+          top: 8px;
+        }
+      }
+    }
+    .search-area {
+      justify-content: center;
+    }
+  }
+  .expanded-row {
+    margin: 0;
+  }
+  .expanded-row {
+    &.with-padding {
+      padding: 16px;
+    }
+    li {
+      text-indent: 1em;
+    }
+    h4 {
+      width: 72px;
+      height: 48px;
+      line-height: 48px;
+    }
+  }
+  div.with-padding {
+    padding: 0;
   }
 }
 

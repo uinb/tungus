@@ -26,9 +26,9 @@ interface IBaseTable {
   type: 'block' | 'extrinsic' | 'account';
   showSearch?: boolean;
   showTable?: boolean;
-  loading: boolean;
+  loading?: boolean;
   onPageChange?: (page: number, pageSize?: number) => void;
-  rowKey: string;
+  rowKey?: string;
 }
 const Main: React.FC<IBaseTable> = ({
   columns,
@@ -41,21 +41,18 @@ const Main: React.FC<IBaseTable> = ({
   rowKey,
 }) => {
   return (
-    <div className="block">
+    <div className="chain-detail base-container">
       {showSearch ? <BaseSearch /> : null}
       {showTable ? (
         <>
-          <main>
-            <Spin spinning={loading}>
-              <Table
-                rowKey={rowKey}
-                columns={columns}
-                dataSource={data}
-                pagination={false}
-                className="user-table"
-              ></Table>
-            </Spin>
-          </main>
+          <Table
+            rowKey={rowKey}
+            columns={columns}
+            dataSource={data}
+            pagination={false}
+            className="user-table with-padding"
+            loading={loading}
+          ></Table>
           <Pagination
             className="user-pagination"
             total={total}

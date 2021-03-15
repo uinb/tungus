@@ -26,10 +26,6 @@ const columns = [
   },
 ];
 const Account: React.FC = () => {
-  return (
-    <div className="accounts base-container">
-      <BaseTable columns={columns} type="account" />
-    </div>
-  );
+  return <BaseTable columns={columns} type="account" />;
 };
 export default Account;

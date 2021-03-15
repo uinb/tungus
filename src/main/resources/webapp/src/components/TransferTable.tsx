@@ -16,14 +16,13 @@
  */
 
 import React from 'react';
-import { Table, Tooltip } from 'antd';
+import { Table } from 'antd';
 import ShortLink from '@/components/ShortLink';
 import Time from '@/components/FormatTime';
 
 import { GenericExtrinsic } from '@polkadot/types/extrinsic/Extrinsic';
 import EventRecord from '@/resultTypes/EventRecord';
 import { useIntl } from 'umi';
-import { formatHash } from '@/utils/commonUtils';
 import type { ApiPromise } from '@polkadot/api';
 import type { AnyJson } from '@polkadot/types/types';
 const SuccessIcon = require('@/assets/successful.svg');

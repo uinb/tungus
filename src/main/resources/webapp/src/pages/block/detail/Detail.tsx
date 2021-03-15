@@ -143,15 +143,17 @@ const BlockPanel: React.FC<IBlockPanel> = React.memo(
             </li>
             <li>
               <h4>{intl.formatMessage({ id: 'status' })}</h4>
-              <img
-                src={blockState ? SuccessIcon : PendingIcon}
-                alt=""
-                style={{ marginRight: '8px' }}
-              />
               <span>
-                {blockState
-                  ? intl.formatMessage({ id: 'finalized' })
-                  : intl.formatMessage({ id: 'unfinalized' })}
+                <img
+                  src={blockState ? SuccessIcon : PendingIcon}
+                  alt=""
+                  style={{ marginRight: '8px' }}
+                />
+                <span>
+                  {blockState
+                    ? intl.formatMessage({ id: 'finalized' })
+                    : intl.formatMessage({ id: 'unfinalized' })}
+                </span>
               </span>
             </li>
             <li>

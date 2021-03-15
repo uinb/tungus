@@ -97,3 +97,33 @@
     font-weight: normal;
   }
 }
+@media screen and (max-width: 786px) {
+  .token {
+    .search-bar {
+      display: none;
+    }
+    .token-des {
+      flex-direction: column;
+      align-items: center;
+      > img {
+        margin: 0;
+      }
+    }
+    .detail {
+      flex-direction: column;
+      > div {
+        h4 {
+          margin-bottom: 16px;
+        }
+        li {
+          flex-direction: column;
+          align-items: flex-start;
+          justify-content: flex-start;
+          &:last-child {
+            border-bottom: 1px solid #343434;
+          }
+        }
+      }
+    }
+  }
+}

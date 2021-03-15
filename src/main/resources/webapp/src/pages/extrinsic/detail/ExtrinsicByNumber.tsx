@@ -55,7 +55,7 @@ const ExtrinsicByNumber: React.FC<{ extrinsicId: string }> = ({
     }
   }, [block, eventData, extrinsicIndex]);
   return (
-    <div className="chain-detail">
+    <div className="chain-detail base-container">
       <div
         className="search-bar"
         style={{

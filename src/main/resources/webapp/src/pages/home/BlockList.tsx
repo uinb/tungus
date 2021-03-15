@@ -37,7 +37,7 @@ const LatestBLockList: React.FC = () => {
       page: 1,
       size: 5,
     }).then((res) => {
-      setBlockList(res.data.list);
+      setBlockList(res.data ? res.data.list : []);
     });
   };
   useEffect(() => {

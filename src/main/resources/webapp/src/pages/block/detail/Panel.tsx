@@ -48,14 +48,14 @@ const BlockByHash: React.FC<{ blockHash: string }> = ({ blockHash }) => {
     }
   };
   return (
-    <div className="chain-detail">
+    <div className="chain-detail base-container">
       <div
-        className="search-bar"
+        className="search-area"
         style={{
           marginBottom: '24px',
         }}
       >
-        <div>
+        <div className="pre-or-next">
           <LeftOutlined
             onClick={() => {
               getPreOrNext('pre');

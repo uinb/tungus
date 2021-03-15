@@ -135,12 +135,14 @@ const ExtrinsicDetail: React.FC<{
                     id: 'block',
                   })}
                 </h4>
-                <img
-                  src={blockState ? SuccessIcon : PendingIcon}
-                  alt=""
-                  style={{ marginRight: '8px' }}
-                />
-                <span>{block.block.header.hash.toString()}</span>
+                <span>
+                  <img
+                    src={blockState ? SuccessIcon : PendingIcon}
+                    alt=""
+                    style={{ marginRight: '8px' }}
+                  />
+                  {block.block.header.hash.toString()}
+                </span>
               </li>
               {extrinsic.era ? (
                 <li>
@@ -229,17 +231,19 @@ const ExtrinsicDetail: React.FC<{
                     id: 'result',
                   })}
                 </h4>
-                <img
-                  src={
-                    extrinsicState.result === 'ExtrinsicSuccess'
-                      ? SuccessIcon
-                      : FailedIcon
-                  }
-                  style={{
-                    marginRight: '8px',
-                  }}
-                  alt=""
-                />
+                <span>
+                  <img
+                    src={
+                      extrinsicState.result === 'ExtrinsicSuccess'
+                        ? SuccessIcon
+                        : FailedIcon
+                    }
+                    style={{
+                      marginRight: '8px',
+                    }}
+                    alt=""
+                  />
+                </span>
                 {extrinsicState.reason ? (
                   <span>
                     {extrinsicState.result === 'ExtrinsicSuccess'

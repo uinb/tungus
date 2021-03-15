@@ -112,6 +112,11 @@
       cursor: pointer;
     }
   }
+  .top {
+    a {
+      font-weight: 500;
+    }
+  }
   ul {
     padding: 0 25px;
     overflow-y: auto;
@@ -182,6 +187,10 @@
         font-weight: 500;
       }
       .bottom {
+        a {
+          color: #fff;
+          font-weight: 400;
+        }
         span {
           font-size: 12px;
         }
@@ -190,7 +199,7 @@
     .right {
       text-align: right;
       h4 {
-        color: #fff;
+        color: @fontColor3;
       }
     }
   }
@@ -256,6 +265,7 @@
         }
       }
       .transfer-list {
+        height: 525px;
         .bottom {
           display: flex;
           flex-direction: column;
