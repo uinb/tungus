@@ -15,19 +15,15 @@
  * limitations under the License.
  */
 
-import React, { useMemo, useEffect, useState } from 'react';
-import BaseTable from '../../components/BaseTable';
+import React, { useEffect, useState } from 'react';
+import BaseTable from '@/components/BaseTable';
+import BaseSearch from '@/components/BaseSearch';
 import ShortLink from '@/components/ShortLink';
 import Time from '@/components/FormatTime';
 import { getRecords } from '@/api/api';
-import { useApi } from '@/context/ApiContext';
 import { useIntl } from 'umi';
 import './index.less';
 const SuccessIcon = require('@/assets/successful.svg');
-interface IBlockData {
-  dataList: IBlockList[];
-  total: number;
-}
 interface IBlockList {
   blkId: number;
   createTime: number;
@@ -36,10 +32,15 @@ interface IBlockList {
   number: number;
   hash: string;
 }
+const defaultPagination: IPagination = {
+  size: 10,
+  total: 1,
+};
 const Block: React.FC = () => {
   const intl = useIntl();
   const [loading, setLoading] = useState<boolean>(false);
-  const [blockData, setBlockData] = useState<IBlockData>();
+  const [blockData, setBlockData] = useState<IBlockList[]>();
+  const [pagination, setPagination] = useState<IPagination>(defaultPagination);
   const columns = [
     {
       title: intl.formatMessage({
@@ -96,10 +97,8 @@ const Block: React.FC = () => {
       size,
     })
       .then((res) => {
-        setBlockData({
-          dataList: res.data.list,
-          total: res.data.total,
-        });
+        setBlockData(res.data.list);
+        setPagination((preState) => ({ ...preState, total: res.data.total }));
       })
       .finally(() => {
         setLoading(false);
@@ -108,16 +107,20 @@ const Block: React.FC = () => {
   useEffect(() => {
     getDataList(1, 10);
   }, []);
-  return blockData ? (
-    <BaseTable
-      onPageChange={onPageChange}
-      loading={loading}
-      columns={columns}
-      data={blockData.dataList}
-      total={blockData.total}
-      type="block"
-      rowKey="blkId"
-    />
-  ) : null;
+  return (
+    <div className="chain-detail base-container">
+      <BaseSearch />
+      {blockData ? (
+        <BaseTable
+          onPageChange={onPageChange}
+          loading={loading}
+          columns={columns}
+          dataSource={blockData}
+          rowKey="blkId"
+          pagination={pagination}
+        />
+      ) : null}
+    </div>
+  );
 };
 export default React.memo(Block);

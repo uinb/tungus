@@ -1,9 +1,3 @@
-import React from 'react';
-import { useIntl } from 'umi';
-import BaseSearch from '@/components/BaseSearch';
-import { SearchOutlined } from '@ant-design/icons';
-import CopyText from '@/components/CopyText';
-import { Tabs, Table, Pagination, DatePicker } from 'antd';
 /**
  * @license
  * Copyright 2021 UINB Technologies Pte. Ltd.
@@ -20,6 +14,13 @@ import { Tabs, Table, Pagination, DatePicker } from 'antd';
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import React from 'react';
+import { useIntl } from 'umi';
+import BaseSearch from '@/components/BaseSearch';
+import { SearchOutlined } from '@ant-design/icons';
+import CopyText from '@/components/CopyText';
+import { Tabs, Table, Pagination, DatePicker } from 'antd';
 
 import { ColumnType } from 'antd/lib/table';
 import ShortHashLink from '@/components/ShortLink';
@@ -360,9 +361,6 @@ const Token: React.FC = () => {
         </Tabs>
       </div>
       <Pagination
-        style={{
-          margin: '32px 0 80px',
-        }}
         className="user-pagination"
         total={100}
         showSizeChanger={false}

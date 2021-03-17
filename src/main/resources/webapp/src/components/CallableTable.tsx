@@ -16,7 +16,7 @@
  */
 
 import React from 'react';
-import { Table, Tooltip } from 'antd';
+import { Table, Tooltip, Pagination } from 'antd';
 import Parameters from '@/components/Parameters';
 import ShortLink from '@/components/ShortLink';
 import Time from '@/components/FormatTime';
@@ -32,21 +32,39 @@ const SuccessIcon = require('@/assets/successful.svg');
 const FailedIcon = require('@/assets/failed.svg');
 interface IProps {
   api: ApiPromise;
-  dataList: {
+  dataSource: {
     ext: string;
     events: string;
-    ext1st: string;
+    ext1st?: string;
+    timestamp?: string;
     block: number;
     extIndex: string;
   }[];
+  pagination?: IPagination | false;
+  onPageChange?: () => {};
+  loading?: boolean;
+  rowKey?: string;
 }
 
-const CallableTable: React.FC<IProps> = ({ dataList, api }) => {
+const CallableTable: React.FC<IProps> = ({
+  dataSource,
+  api,
+  pagination,
+  onPageChange,
+  loading,
+}) => {
   const intl = useIntl();
   const registry = api.registry;
-  const decodeList: ChainTypes.IExtrinsic[] = dataList.map((item) => {
+  const decodeList: ChainTypes.IExtrinsic[] = dataSource.map((item) => {
+    let time;
     const extrinsic = new GenericExtrinsic(registry, item.ext);
-    const timestampExtrinsic = new GenericExtrinsic(registry, item.ext1st);
+    if (item.ext1st) {
+      const timestampExtrinsic = new GenericExtrinsic(registry, item.ext1st);
+      time = timestampExtrinsic.args[0].toString();
+    }
+    if (item.timestamp) {
+      time = item.timestamp;
+    }
     const eventRecord = new EventRecord(registry, item.events);
     const eventsResult = eventRecord.filter((record) => {
       return api.events.system.ExtrinsicFailed.is(record.event);
@@ -61,7 +79,7 @@ const CallableTable: React.FC<IProps> = ({ dataList, api }) => {
       method: extrinsic.method.method,
       metaArgs: extrinsic.meta.args,
       methodArgs: extrinsic.method.args,
-      time: timestampExtrinsic.args[0].toString(),
+      time,
     };
   });
   const callableColumns = [
@@ -108,21 +126,37 @@ const CallableTable: React.FC<IProps> = ({ dataList, api }) => {
     },
   ];
   return (
-    <Table
-      className="user-table f14"
-      columns={callableColumns}
-      dataSource={decodeList}
-      expandable={{
-        expandedRowRender: (row) => <Parameters extrinsic={row} />,
-        expandIcon: ({ expanded, record, onExpand }) => (
-          <span className="expand-button" onClick={(e) => onExpand(record, e)}>
-            {expanded ? <DownOutlined /> : <RightOutlined />}
-          </span>
-        ),
-        expandIconColumnIndex: 5,
-      }}
-      pagination={false}
-    />
+    <>
+      <Table
+        className="user-table with-padding"
+        columns={callableColumns}
+        dataSource={decodeList}
+        expandable={{
+          expandedRowRender: (row) => <Parameters extrinsic={row} />,
+          expandIcon: ({ expanded, record, onExpand }) => (
+            <span
+              className="expand-button"
+              onClick={(e) => onExpand(record, e)}
+            >
+              {expanded ? <DownOutlined /> : <RightOutlined />}
+            </span>
+          ),
+          expandIconColumnIndex: 5,
+        }}
+        pagination={false}
+        loading={loading}
+      />
+      {pagination ? (
+        <Pagination
+          className="user-pagination"
+          total={pagination.total}
+          pageSize={pagination.size}
+          showSizeChanger={false}
+          onChange={onPageChange}
+          // hideOnSinglePage={true}
+        />
+      ) : null}
+    </>
   );
 };
 export default React.memo(CallableTable);

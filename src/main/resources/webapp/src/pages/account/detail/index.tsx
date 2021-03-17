@@ -24,42 +24,34 @@ import { Tabs, Spin, Pagination } from 'antd';
 import CopyText from '@/components/CopyText';
 import Nodata from '@/components/Nodata';
 import { useApi } from '@/context/ApiContext';
-
 import { AccountInfo } from '@polkadot/types/interfaces/system';
 import { getAccountData } from '@/api/api';
-
-const UserIcon = require('@/assets/user.svg');
-
-const { TabPane } = Tabs;
 interface IPage {
   pageSize: number;
   current: number;
   total: number;
 }
-interface IDataList {
-  ext: string;
-  events: string;
-  ext1st: string;
-  block: number;
-  extIndex: string;
-}
-interface IData {
-  dataList: IDataList[];
-  total: number;
-}
+const UserIcon = require('@/assets/user.svg');
+const { TabPane } = Tabs;
 
 const defaultPageOptions = {
   pageSize: 5,
   current: 1,
   total: 0,
 };
+const defaultTotalMap = {
+  callableTotal: 0,
+  transferTotal: 0,
+  stashTotal: 0,
+};
 const AccountDetail: React.FC = () => {
   const intl = useIntl();
   const { id } = useParams<IRouteParams>();
   const { api } = useApi();
-  const [callableData, setCallableData] = useState<IData>();
-  const [transferData, setTransferData] = useState<IData>();
-  const [stashData, setStashData] = useState<IData>();
+  const [callableData, setCallableData] = useState<any[]>([]);
+  const [transferData, setTransferData] = useState<any[]>([]);
+  const [stashData, setStashData] = useState<any[]>([]);
+  const [totalMap, setTotalMap] = useState(defaultTotalMap);
   const [userInfo, setUserInfo] = useState<AccountInfo>();
   const [activeKey, setActiveKey] = useState<string>('callable');
   const [pageOptions, setPageOptions] = useState<IPage>(defaultPageOptions);
@@ -87,16 +79,26 @@ const AccountDetail: React.FC = () => {
         size: options ? options.pageSize : pageOptions.pageSize,
       })
         .then((res) => {
-          const data = {
-            dataList: res.data.list,
-            total: res.data.total,
-          };
+          const data = res.data.list;
+          const total = res.data.total;
           if (key === 'callable') {
             setCallableData(data);
+            setTotalMap((totalMap) => ({
+              ...totalMap,
+              callableTotal: total,
+            }));
           } else if (key === 'transfer') {
             setTransferData(data);
+            setTotalMap((totalMap) => ({
+              ...totalMap,
+              transferTotal: total,
+            }));
           } else {
             setStashData(data);
+            setTotalMap((totalMap) => ({
+              ...totalMap,
+              stashTotal: total,
+            }));
           }
           setPageOptions((preOptions) => ({
             ...preOptions,
@@ -182,11 +184,11 @@ const AccountDetail: React.FC = () => {
                 <TabPane
                   tab={`${intl.formatMessage({
                     id: 'callables',
-                  })} (${callableData?.total || 0})`}
+                  })} (${totalMap.callableTotal})`}
                   key="callable"
                 >
                   {callableData ? (
-                    <CallableTable api={api} dataList={callableData.dataList} />
+                    <CallableTable api={api} dataSource={callableData} />
                   ) : (
                     <Nodata />
                   )}
@@ -194,11 +196,11 @@ const AccountDetail: React.FC = () => {
                 <TabPane
                   tab={`${intl.formatMessage({
                     id: 'transfer',
-                  })} (${transferData?.total || 0})`}
+                  })} (${totalMap.transferTotal})`}
                   key="transfer"
                 >
                   {transferData ? (
-                    <TransferTable api={api} dataList={transferData.dataList} />
+                    <TransferTable api={api} dataSource={transferData} />
                   ) : (
                     <Nodata />
                   )}
@@ -206,7 +208,7 @@ const AccountDetail: React.FC = () => {
                 <TabPane
                   tab={`${intl.formatMessage({
                     id: 'stash',
-                  })} (${stashData?.total || 0})`}
+                  })} (${totalMap.stashTotal})`}
                   key="stash"
                 ></TabPane>
               </Tabs>

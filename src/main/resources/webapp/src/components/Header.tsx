@@ -15,21 +15,18 @@
  * limitations under the License.
  */
 
-import React, { useMemo } from 'react';
-import { Menu } from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Menu, Drawer } from 'antd';
 import BaseSearch from '@/components/BaseSearch';
 import { DownOutlined } from '@ant-design/icons';
 import { Link, useIntl, useLocation } from 'umi';
 import Locale from '@/components/Locale';
 import MenuIcon from '@/assets/menu.svg';
+import CrossIcon from '@/assets/cross.svg';
 import './header.less';
-
+import BaseMenu, { IMenu } from './BaseMenu';
 const { SubMenu } = Menu;
-interface IMenu {
-  key: string;
-  title: string;
-  submenu?: IMenu[];
-}
+
 const Header: React.FC = (props) => {
   const intl = useIntl();
   const location = useLocation();
@@ -41,7 +38,88 @@ const Header: React.FC = (props) => {
       return ['/' + type];
     }
   }, [location]);
-
+  const menuList: IMenu[] = [
+    {
+      key: 'home',
+      title: intl.formatMessage({
+        id: 'home',
+      }),
+      path: '/',
+    },
+    {
+      key: 'chain',
+      title: intl.formatMessage({
+        id: 'chain',
+      }),
+      subMenu: [
+        {
+          key: 'block',
+          title: intl.formatMessage({
+            id: 'blocks',
+          }),
+          path: '/block',
+        },
+        {
+          key: 'callable',
+          title: intl.formatMessage({
+            id: 'callables',
+          }),
+          path: '/callable',
+        },
+        {
+          key: 'transfer',
+          title: intl.formatMessage({
+            id: 'transfers',
+          }),
+          path: '/callable?type=transfer',
+        },
+        {
+          key: 'stash',
+          title: intl.formatMessage({
+            id: 'stash',
+          }),
+          path: '/callable?type=stash',
+        },
+        {
+          key: 'pledge',
+          title: intl.formatMessage({
+            id: 'pledge',
+          }),
+          path: '/callable?type=pledge',
+        },
+      ],
+    },
+    {
+      key: 'account',
+      title: intl.formatMessage({
+        id: 'account',
+      }),
+      path: '/account',
+    },
+    {
+      key: 'token',
+      title: intl.formatMessage({
+        id: 'token',
+      }),
+      path: '/token',
+    },
+  ];
+  const [visible, setVisible] = useState(false);
+  const onClose = () => {
+    setVisible(false);
+  };
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 786) {
+        setVisible(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  useEffect(() => {
+    setVisible(false);
+  }, [location]);
   return (
     <>
       <header
@@ -90,7 +168,7 @@ const Header: React.FC = (props) => {
                     <DownOutlined />
                   </span>
                 }
-                popupOffset={[-18, 5]}
+                popupOffset={[-15, 5]}
               >
                 <Menu.Item key="/block">
                   <Link to="/block">
@@ -153,17 +231,43 @@ const Header: React.FC = (props) => {
           </div>
         </div>
       </header>
-      <header className="mobile-header">
+      <header
+        className="mobile-header"
+        style={{
+          backgroundImage:
+            location.pathname === '/'
+              ? `url(${require('@/assets/bg.png')})`
+              : 'none',
+        }}
+      >
         <div className="base-container">
           <div className="header">
             <Locale />
-            <img className="logo" src={require(`@/assets/logo.svg`)} alt="" />
-            <img src={MenuIcon} alt="" />
+            <a href="/#/">
+              <img className="logo" src={require(`@/assets/logo.svg`)} alt="" />
+            </a>
+            <img
+              src={MenuIcon}
+              alt=""
+              onClick={() => {
+                setVisible(true);
+              }}
+            />
           </div>
           <BaseSearch showSelect={false} />
         </div>
       </header>
+      <Drawer
+        title={<img src={CrossIcon} onClick={onClose} />}
+        placement="right"
+        closable={false}
+        onClose={onClose}
+        visible={visible}
+        className="user-drawer"
+      >
+        <BaseMenu menuList={menuList} />
+      </Drawer>
     </>
   );
 };
-export default Header;
+export default React.memo(Header);

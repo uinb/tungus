@@ -16,14 +16,13 @@
  */
 
 import React from 'react';
-import { Table, Tooltip } from 'antd';
+import { Table, Pagination } from 'antd';
 import ShortLink from '@/components/ShortLink';
 import Time from '@/components/FormatTime';
 
 import { GenericExtrinsic } from '@polkadot/types/extrinsic/Extrinsic';
 import EventRecord from '@/resultTypes/EventRecord';
 import { useIntl } from 'umi';
-import { formatHash } from '@/utils/commonUtils';
 import type { ApiPromise } from '@polkadot/api';
 import type { AnyJson } from '@polkadot/types/types';
 const SuccessIcon = require('@/assets/successful.svg');
@@ -32,13 +31,17 @@ const ToIcon = require('@/assets/to.svg');
 
 interface IProps {
   api: ApiPromise;
-  dataList: {
+  dataSource: {
     ext: string;
     events: string;
     ext1st: string;
     block: number;
     extIndex: string;
   }[];
+  pagination?: IPagination | false;
+  onPageChange?: () => {};
+  loading?: boolean;
+  rowKey?: string;
 }
 interface ITransfer extends ChainTypes.IExtrinsic {
   block: string;
@@ -46,10 +49,16 @@ interface ITransfer extends ChainTypes.IExtrinsic {
   to: string;
   amount: AnyJson;
 }
-const TransferTable: React.FC<IProps> = ({ dataList, api }) => {
+const TransferTable: React.FC<IProps> = ({
+  dataSource,
+  api,
+  onPageChange,
+  pagination,
+  loading,
+}) => {
   const intl = useIntl();
   const registry = api.registry;
-  const decodeList: ITransfer[] = dataList.map((item) => {
+  const decodeList: ITransfer[] = dataSource.map((item) => {
     const extrinsic = new GenericExtrinsic(registry, item.ext);
     const timestampExtrinsic = new GenericExtrinsic(registry, item.ext1st);
     const eventRecord = new EventRecord(registry, item.events);
@@ -158,12 +167,25 @@ const TransferTable: React.FC<IProps> = ({ dataList, api }) => {
     },
   ];
   return (
-    <Table
-      className="user-table f14"
-      columns={transferColumns}
-      dataSource={decodeList}
-      pagination={false}
-    />
+    <>
+      <Table
+        className="user-table with-padding"
+        columns={transferColumns}
+        dataSource={decodeList}
+        pagination={false}
+        loading={loading}
+      />
+      {pagination ? (
+        <Pagination
+          className="user-pagination"
+          total={pagination.total}
+          pageSize={pagination.size}
+          showSizeChanger={false}
+          onChange={onPageChange}
+          // hideOnSinglePage={true}
+        />
+      ) : null}
+    </>
   );
 };
 export default React.memo(TransferTable);

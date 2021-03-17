@@ -32,8 +32,8 @@ h6 {
   height: 0px;
   background-color: #b0aeda;
 }
-/** antd css reset */
-// antd-menu样式重置
+
+/** antd menu css reset */
 .ant-menu-horizontal {
   line-height: 56px;
   border: none;
@@ -70,4 +70,62 @@ h6 {
   .ant-menu-submenu-title .anticon {
     margin: 0;
   }
+}
+.ant-menu.ant-menu-horizontal {
+  .ant-menu-item a {
+    color: #929299;
+  }
+  .ant-menu-item-selected a,
+  > .ant-menu-item a:hover {
+    color: #fff;
+  }
+}
+
+/** antd tabs css reset */
+.user-tab.ant-tabs {
+  color: #fff;
+  font-weight: 500;
+  .ant-tabs-nav .ant-tabs-nav-wrap,
+  div > .ant-tabs-nav .ant-tabs-nav-wrap {
+    padding-left: 0;
+  }
+  .ant-tabs-tab {
+    padding: 12px;
+    &:hover {
+      color: #fff;
+    }
+  }
+  .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: #fff;
+  }
+  .ant-tabs-tab-btn {
+    transition: none;
+  }
+  .ant-tabs-ink-bar {
+    background-color: @red1;
+  }
+  &.ant-tabs-top > .ant-tabs-nav .ant-tabs-ink-bar {
+    height: 3px;
+  }
+  &.ant-tabs-top > .ant-tabs-nav::before {
+    border-bottom: 1px solid @borderColor1;
+  }
+  .ant-tabs-tab-btn:focus,
+  .ant-tabs-tab-remove:focus,
+  .ant-tabs-tab-btn:active,
+  .ant-tabs-tab-remove:active {
+    color: #fff;
+  }
+}
+
+/** antd drawer css reset */
+.ant-drawer-header {
+  background-color: #000;
+  border-bottom: none;
+}
+.ant-drawer-content {
+  background-color: #000;
+}
+.ant-drawer-body {
+  padding: 0;
 }

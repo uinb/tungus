@@ -55,13 +55,8 @@ const ExtrinsicByNumber: React.FC<{ extrinsicId: string }> = ({
     }
   }, [block, eventData, extrinsicIndex]);
   return (
-    <div className="chain-detail">
-      <div
-        className="search-bar"
-        style={{
-          marginBottom: '24px',
-        }}
-      >
+    <div className="chain-detail base-container">
+      <div className="search-area">
         <div>
           <span style={{ margin: '0 24px' }}>Callable#{extrinsicId}</span>
         </div>

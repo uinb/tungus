@@ -1,6 +1,4 @@
-.block {
-  width: 1200px;
-  margin: 0 auto;
+.chain-detail {
   main {
     padding: 32px 28px 0;
     background: #212121;
@@ -9,5 +7,15 @@
   }
   .user-pagination {
     margin-top: 32px;
+  }
+}
+@media screen and (max-width: 786px) {
+  .chain-detail {
+    .search-bar {
+      display: none;
+    }
+  }
+  .user-pagination {
+    text-align: center;
   }
 }

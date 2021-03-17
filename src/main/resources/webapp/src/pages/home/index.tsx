@@ -22,10 +22,12 @@ import BlockList from './BlockList';
 import TransferList from './TransferList';
 import { useIntl, NavLink } from 'umi';
 import FinalizedContext from '@/context/FinalizedContext';
+import { useApi } from '@/context/ApiContext';
 import { formatNumber } from '@/utils/commonUtils';
 import './index.less';
 
 const Home: FC = () => {
+  const { api } = useApi();
   const intl = useIntl();
   const finalizedHeader = useContext(FinalizedContext);
   const stashColumns = [
@@ -124,7 +126,7 @@ const Home: FC = () => {
               {intl.formatMessage({ id: 'viewAll' })}
             </NavLink>
           </header>
-          <TransferList />
+          {api ? <TransferList api={api} /> : null}
         </div>
         <div className="detail-card">
           <header>
@@ -136,7 +138,7 @@ const Home: FC = () => {
               {intl.formatMessage({ id: 'viewAll' })}
             </NavLink>
           </header>
-          <div className="base-container" style={{ marginTop: '16px' }}>
+          <div style={{ marginTop: '16px', padding: '0 16px' }}>
             <Table
               columns={stashColumns}
               dataSource={[]}
@@ -156,8 +158,8 @@ const Home: FC = () => {
             </NavLink>
           </header>
           <div
-            className="base-container"
             style={{
+              padding: '0 16px',
               marginTop: '16px',
             }}
           >

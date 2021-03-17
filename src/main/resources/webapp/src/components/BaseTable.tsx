@@ -16,56 +16,46 @@
  */
 
 import React from 'react';
-import { Table, Pagination, Spin } from 'antd';
-import BaseSearch from './BaseSearch';
+import { Table, Pagination } from 'antd';
 import './baseTable.less';
 interface IBaseTable {
   columns: any[];
-  data?: any[];
+  dataSource?: any[];
   total?: number;
-  type: 'block' | 'extrinsic' | 'account';
-  showSearch?: boolean;
-  showTable?: boolean;
-  loading: boolean;
+  loading?: boolean;
   onPageChange?: (page: number, pageSize?: number) => void;
-  rowKey: string;
+  rowKey?: string;
+  pagination?: IPagination | false;
 }
-const Main: React.FC<IBaseTable> = ({
+const BaseTable: React.FC<IBaseTable> = ({
   columns,
-  data,
-  total,
-  showSearch = true,
-  showTable = true,
+  dataSource = [],
   onPageChange,
   loading,
   rowKey,
+  pagination,
 }) => {
   return (
-    <div className="block">
-      {showSearch ? <BaseSearch /> : null}
-      {showTable ? (
-        <>
-          <main>
-            <Spin spinning={loading}>
-              <Table
-                rowKey={rowKey}
-                columns={columns}
-                dataSource={data}
-                pagination={false}
-                className="user-table"
-              ></Table>
-            </Spin>
-          </main>
-          <Pagination
-            className="user-pagination"
-            total={total}
-            showSizeChanger={false}
-            onChange={onPageChange}
-            hideOnSinglePage={true}
-          />
-        </>
+    <>
+      <Table
+        rowKey={rowKey}
+        columns={columns}
+        dataSource={dataSource}
+        pagination={false}
+        className="user-table with-padding"
+        loading={loading}
+      ></Table>
+      {pagination ? (
+        <Pagination
+          className="user-pagination"
+          total={pagination.total}
+          pageSize={pagination.size}
+          showSizeChanger={false}
+          onChange={onPageChange}
+        />
       ) : null}
-    </div>
+      )
+    </>
   );
 };
-export default Main;
+export default React.memo(BaseTable);
