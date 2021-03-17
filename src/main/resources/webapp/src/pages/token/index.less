@@ -112,18 +112,49 @@
     .detail {
       flex-direction: column;
       > div {
+        margin-bottom: 16px;
         h4 {
           margin-bottom: 16px;
         }
         li {
+          position: relative;
+          padding: 8px 0;
+          height: auto;
           flex-direction: column;
           align-items: flex-start;
           justify-content: flex-start;
+          word-break: break-all;
           &:last-child {
             border-bottom: 1px solid #343434;
           }
+          .copy-suffix {
+            position: absolute;
+            top: 8px;
+            right: 0;
+          }
+          span:nth-child(2){
+            margin-top: 8px;
+          }
         }
       }
+    }
+    .user-tab {
+      .bar {
+        flex-direction: column;
+        align-items: flex-start;
+        p {
+          margin-bottom: 8px;
+        }
+      }
+    }
+    .user-table table {
+      width: 1200px;
+    }
+    .ant-picker {
+      padding: 0;
+    }
+    .ant-picker-input {
+      width: 140px;
     }
   }
 }

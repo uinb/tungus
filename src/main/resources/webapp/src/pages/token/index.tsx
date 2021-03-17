@@ -361,9 +361,6 @@ const Token: React.FC = () => {
         </Tabs>
       </div>
       <Pagination
-        style={{
-          margin: '32px 0 80px',
-        }}
         className="user-pagination"
         total={100}
         showSizeChanger={false}

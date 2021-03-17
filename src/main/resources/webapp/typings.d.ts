@@ -25,3 +25,7 @@ declare module '*.svg' {
   const url: string;
   export default url;
 }
+declare interface IPagination {
+  size: number;
+  total: number;
+}

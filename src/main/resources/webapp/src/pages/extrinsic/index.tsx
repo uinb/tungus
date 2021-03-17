@@ -15,15 +15,53 @@
  * limitations under the License.
  */
 
-import React, { useMemo } from 'react';
-import BaseTable from '../../components/BaseTable';
+import React, { useEffect, useMemo, useState } from 'react';
+import BaseTable from '@/components/BaseTable';
+import BaseSearch from '@/components/BaseSearch';
+import CallableTable from '@/components/CallableTable';
+import TransferTable from '@/components/TransferTable';
+import Time from '@/components/FormatTime';
+import ShortLink from '@/components/ShortLink';
 import { useLocation, useIntl } from 'umi';
+import { useApi } from '@/context/ApiContext';
+import { getRecords } from '@/api/api';
 
-const typeList = ['transfer', 'stash', 'pledge'];
-const Block: React.FC = (props) => {
+const defaultPagination: IPagination = {
+  size: 10,
+  total: 1,
+};
+
+const typeList = ['callable', 'transfer', 'stash', 'pledge'];
+const processData = (type: string, data: any[]) => {
+  if (typeList.includes(type)) {
+    return data.map((transfer) => {
+      return {
+        ext: transfer.data,
+        events: transfer.events,
+        block: transfer.id.replace(/-.*/, ''),
+        extIndex: transfer.id,
+        timestamp: transfer.timestamp,
+      };
+    });
+  } else {
+    return [];
+  }
+};
+const Callable: React.FC = () => {
+  const { api } = useApi();
   const intl = useIntl();
   const location = useLocation();
-  const type = (location as any).query.type;
+  const [loading, setLoading] = useState<boolean>(false);
+  const [tableData, setTableData] = useState<any[]>([]);
+  const [pagination, setPagination] = useState<IPagination>(defaultPagination);
+  const type = useMemo(() => {
+    setTableData([]);
+    let type = (location as any).query.type;
+    if (!type) {
+      type = location.pathname.replace('/', '');
+    }
+    return type;
+  }, [location]);
   const typeColumns: any = useMemo(() => {
     return {
       default: [
@@ -31,25 +69,31 @@ const Block: React.FC = (props) => {
           title: `${intl.formatMessage({
             id: 'callable',
           })} ID`,
-          dataIndex: 'id',
+          dataIndex: 'index',
+          width: 150,
         },
         {
           title: intl.formatMessage({
             id: 'block',
           }),
-          dataIndex: 'blcok',
+          dataIndex: 'block',
+          width: 120,
         },
         {
           title: `${intl.formatMessage({
             id: 'hash',
           })}`,
           dataIndex: 'hash',
+          width: 180,
+          render: (text: string) => <ShortLink hash={text} path="/account" />,
         },
         {
           title: intl.formatMessage({
             id: 'time',
           }),
-          dataIndex: 'time',
+          dataIndex: 'timestamp',
+          width: 150,
+          render: (time: number) => <Time time={time} />,
         },
         {
           title: intl.formatMessage({
@@ -69,31 +113,39 @@ const Block: React.FC = (props) => {
           title: `${intl.formatMessage({
             id: 'callable',
           })} ID`,
-          dataIndex: 'id',
+          dataIndex: 'index',
+          width: 150,
         },
         {
           title: intl.formatMessage({
             id: 'block',
           }),
-          dataIndex: 'blcok',
+          dataIndex: 'block',
+          width: 120,
         },
         {
           title: intl.formatMessage({
             id: 'time',
           }),
-          dataIndex: 'time',
+          dataIndex: 'timestamp',
+          width: 150,
+          render: (time: number) => <Time time={time} />,
         },
         {
           title: intl.formatMessage({
             id: 'from',
           }),
           dataIndex: 'from',
+          width: 180,
+          render: (text: string) => <ShortLink hash={text} path="/account" />,
         },
         {
           title: intl.formatMessage({
             id: 'to',
           }),
           dataIndex: 'to',
+          width: 180,
+          render: (text: string) => <ShortLink hash={text} path="/account" />,
         },
         {
           title: intl.formatMessage({
@@ -112,6 +164,7 @@ const Block: React.FC = (props) => {
             id: 'hash',
           })}`,
           dataIndex: 'hash',
+          render: (text: string) => <ShortLink hash={text} path="/callable" />,
         },
       ],
       stash: [
@@ -142,13 +195,52 @@ const Block: React.FC = (props) => {
       ],
     };
   }, [intl]);
+  const onPageChange = (page: number) => {
+    getTableData(page);
+  };
+  const getTableData = (page: number = 1, size: number = 10) => {
+    setLoading(true);
+    getRecords(type, {
+      page,
+      size,
+    })
+      .then((res) => {
+        if (api && res.data) {
+          setTableData(processData(type, res.data.list));
+          setPagination({ ...pagination, total: res.data.total });
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+  useEffect(() => {
+    getTableData();
+  }, [type]);
+  useEffect(() => {
+    setTableData([]);
+  }, [location]);
+  let Component: React.FC<any> = BaseTable;
+  if (type === 'callable') {
+    Component = CallableTable;
+  } else if (type === 'transfer') {
+    Component = TransferTable;
+  }
   return (
-    <BaseTable
-      {...props}
-      columns={typeColumns[type] ? typeColumns[type] : typeColumns.default}
-      type={type}
-      showTable={type === undefined || typeList.includes(type)}
-    />
+    <div className="chain-detail base-container">
+      <BaseSearch />
+      {api ? (
+        <Component
+          dataSource={tableData}
+          columns={typeColumns[type] ? typeColumns[type] : []}
+          onPageChange={onPageChange}
+          rowKey="index"
+          loading={loading}
+          pagination={pagination}
+          api={api}
+        />
+      ) : null}
+    </div>
   );
 };
-export default Block;
+export default React.memo(Callable);

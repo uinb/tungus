@@ -17,7 +17,7 @@
 
 import React from 'react';
 import BaseTable from '@/components/BaseTable';
-import './index.less';
+import BaseSearch from '@/components/BaseSearch';
 const columns = [
   {
     title: 'Account',
@@ -26,6 +26,11 @@ const columns = [
   },
 ];
 const Account: React.FC = () => {
-  return <BaseTable columns={columns} type="account" />;
+  return (
+    <div className="chain-detail base-container">
+      <BaseSearch />
+      <BaseTable columns={columns} />
+    </div>
+  );
 };
 export default Account;

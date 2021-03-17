@@ -168,7 +168,7 @@ const Header: React.FC = (props) => {
                     <DownOutlined />
                   </span>
                 }
-                popupOffset={[-18, 5]}
+                popupOffset={[-15, 5]}
               >
                 <Menu.Item key="/block">
                   <Link to="/block">
@@ -243,7 +243,9 @@ const Header: React.FC = (props) => {
         <div className="base-container">
           <div className="header">
             <Locale />
-            <img className="logo" src={require(`@/assets/logo.svg`)} alt="" />
+            <a href="/#/">
+              <img className="logo" src={require(`@/assets/logo.svg`)} alt="" />
+            </a>
             <img
               src={MenuIcon}
               alt=""

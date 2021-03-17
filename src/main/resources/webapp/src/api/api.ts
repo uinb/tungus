@@ -20,7 +20,7 @@ interface IPage {
   page: number;
   size: number;
 }
-
+axios.defaults.timeout = 5000;
 export const scan_search = (key: string) =>
   axios.get('/api/v1/fusotao/search/' + key);
 
