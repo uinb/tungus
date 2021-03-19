@@ -5,12 +5,14 @@ import static tech.uinb.tungus.entity.ObjType.ACCOUNT;
 import io.emeraldpay.polkaj.scale.ScaleCodecWriter;
 import io.emeraldpay.polkaj.scale.writer.ListWriter;
 import io.emeraldpay.polkaj.types.ByteData;
+import io.lettuce.core.StrAlgoArgs.By;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -25,11 +27,14 @@ import org.springframework.web.bind.annotation.*;
 import tech.uinb.tungus.codec.EventRecord;
 import tech.uinb.tungus.codec.EventWriter;
 import tech.uinb.tungus.config.Constants;
+import tech.uinb.tungus.entity.BlockHeader;
 import tech.uinb.tungus.entity.Ext;
 import tech.uinb.tungus.entity.HashIdMap;
+import tech.uinb.tungus.entity.TableMeta;
 import tech.uinb.tungus.entity.TransferExt;
 import tech.uinb.tungus.entity.po.AccountScanPO;
 import tech.uinb.tungus.entity.po.PagePO;
+import tech.uinb.tungus.entity.vo.CallableVO;
 import tech.uinb.tungus.entity.vo.PageDataVO;
 import tech.uinb.tungus.service.*;
 
@@ -37,6 +42,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import tech.uinb.tungus.service.impl.LongSeqSplitter;
 import tech.uinb.tungus.service.impl.ScheduleServiceImpl;
 
 /**
@@ -60,10 +66,6 @@ public class BlockResource {
     private AccountTransactionService accountTransactionService;
     @Autowired
     private AccountStashService accountStashService;
-    @Autowired
-    private ScheduleServiceImpl scheduleService;
-    @Autowired
-    private ExtrinsicEventService extrinsicEventService;
     @Autowired
     private EventDataService eventDataService;
     @Autowired
@@ -104,8 +106,10 @@ public class BlockResource {
 
     @ApiOperation(value = "scan", httpMethod = "POST")
     @PostMapping("/scan/{type}")
-    public ResponseEntity scan(@PathVariable String type, @RequestBody AccountScanPO accountScanPO)
-            throws IOException {
+    public ResponseEntity scan(@PathVariable String type, @RequestBody AccountScanPO accountScanPO){
+        if (!accountScanPO.check()){
+            return new ResponseEntity(HttpStatus.NO_CONTENT);
+        }
         HashIdMap hashIdMap = hashIdMapService.getByHash(accountScanPO.getAccount());
         if (hashIdMap == null || hashIdMap.getType() != ACCOUNT || !accountScanPO.check()) {
             return new ResponseEntity(HttpStatus.NO_CONTENT);
@@ -125,43 +129,23 @@ public class BlockResource {
                 return new ResponseEntity(HttpStatus.NO_CONTENT);
         }
         List result = new ArrayList<>();
-
-        long t1 = System.currentTimeMillis();
-
-
         for (int i = 0; i < extIds.size(); i++) {
             if (accountScanPO.getSize() * (accountScanPO.getPage() - 1) <= i && i < accountScanPO.getSize() * (accountScanPO.getPage())) {
                 Ext ext = blockService.getExtById(extIds.get(i));
-                long tt1 = System.currentTimeMillis();
-
-                List<EventRecord> events = new ArrayList();
-                List<Long> list = extrinsicEventService.getEventIdByExtId(ext.getId());
-                list.forEach(id -> {
-                    events.add(scheduleService.decodeEvent(eventDataService.getEventDataById(id).getData()));
-                });
-
                 long firstExtId = blockExtService.getFirstExtIdByExtId(ext.getId());
                 Ext ext_1st = blockService.getExtById(firstExtId);
-
-                ListWriter listWriter = new ListWriter(scheduleService.getEventWriter().get());
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                listWriter.write(new ScaleCodecWriter(out), events);
-
-                long tt2 = System.currentTimeMillis();
-
                 result.add(Map.of(
                         "ext1st", new ByteData(ext_1st.getData()).toString(),
                         "ext", new ByteData(ext.getData()).toString(),
                         "extIndex", blockExtService.getExtIndexInBlockByExtId(extIds.get(i)),
-                        "events", new ByteData(out.toByteArray()).toString(),
+                        "events", eventDataService.getEventsDataByExtId(ext_1st.getId()),
                         "block", blockExtService.getBlockIdByExtId(extIds.get(i))
                 ));
-                System.out.println(tt2 - tt1 + ":耗时");
             }
         }
-        System.out.println(System.currentTimeMillis() - t1);
-        return new ResponseEntity(PageDataVO.valueOf(result, accountScanPO.getPage(), accountScanPO.getSize(), extIds.size()), HttpStatus.OK);
+        return new ResponseEntity(PageDataVO.valueOf(result,accountScanPO.getPage(),accountScanPO.getSize(),extIds.size()),HttpStatus.OK);
     }
+
 
     @ApiOperation(value = "record", httpMethod = "POST")
     @PostMapping("/record/{type}")
@@ -170,13 +154,42 @@ public class BlockResource {
         switch (type) {
             case Constants.TYPE_BLOCK:
                 var lastNumber = blockService.lastBlockNumber();
-                for (long i = lastNumber - pagePO.getSize() * (pagePO.getPage() - 1); i > lastNumber - pagePO.getSize() * (pagePO.getPage()); i--) {
-                    var blockHeader = blockService.getBlockHeaderById(i);
-
-
+                List list = new ArrayList();
+                for (long i = lastNumber-pagePO.getSize()*(pagePO.getPage()-1); i > lastNumber-pagePO.getSize()*(pagePO.getPage()); i--) {
+                    list.add(i);
                 }
+                var blockHeaders = blockService.getBlockByIds(list);
+                pageDataVO = PageDataVO.valueOf(blockHeaders,pagePO.getPage(),pagePO.getSize(),lastNumber);
                 break;
             case Constants.TYPE_TRANSFER:
+                var page = transferExtService.query(pagePO);
+                List data = page.getList().stream()
+                    .map(item ->
+                        CallableVO.valueOf(
+                            blockExtService.getExtIndexInBlockByExtId(item.getExtId()),
+                            eventDataService.getEventsDataByExtId(item.getExtId()),
+                            new ByteData(blockService.getExtById(item.getExtId()).getData()).toString(),
+                            blockService.getTimestampByExtId(item.getExtId())
+                        )
+                    )
+                    .collect(Collectors.toList());
+                pageDataVO = PageDataVO.valueOf(data, pagePO.getPage(), pagePO.getSize(), page.getTotal());
+                break;
+            case Constants.TYPE_CALLABLE:
+                var extId = blockService.lastExtNumber();
+                List extIds = new ArrayList();
+                for (long i = extId-pagePO.getSize()*(pagePO.getPage()-1); i > extId-pagePO.getSize()*(pagePO.getPage()); i--) {
+                    extIds.add(i);
+                }
+                List<Ext> exts =  blockService.getExtByIds(extIds);
+                List datas = exts.stream().map(item ->
+                        CallableVO.valueOf(
+                            blockExtService.getExtIndexInBlockByExtId(item.getId()),
+                            eventDataService.getEventsDataByExtId(item.getId()),
+                            new ByteData(item.getData()).toString(),
+                            blockService.getTimestampByExtId(item.getId()))
+                ).collect(Collectors.toList());
+                pageDataVO = PageDataVO.valueOf(datas,pagePO.getPage(),pagePO.getSize(),extId);
                 break;
             case Constants.TYPE_STASH:
                 break;
@@ -187,21 +200,9 @@ public class BlockResource {
         return new ResponseEntity(pageDataVO, HttpStatus.OK);
     }
 
-    public ResponseEntity getTransfer(PagePO pageable) {
-        var page = transferExtService.query(pageable);
-        List<Ext> data = page.getList().stream()
-                .map(item -> blockService.getExtById(item.getId()))
-                .collect(Collectors.toList());
-        var result = PageDataVO.valueOf(data, pageable.getPage(), pageable.getSize(), page.getTotal());
-        return new ResponseEntity(result, HttpStatus.OK);
-    }
 
-//    @ApiOperation(value = "statistics", httpMethod = "GET")
-//    @GetMapping("/statistics")
-//    public ResponseEntity statistics(){
-//
-//        return new ResponseEntity(pageDataVO,HttpStatus.OK);
-//    }
+
+
 
 }
 

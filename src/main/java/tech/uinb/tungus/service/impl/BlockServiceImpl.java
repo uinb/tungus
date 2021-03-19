@@ -26,6 +26,7 @@ import io.emeraldpay.polkaj.scaletypes.ExtrinsicCall;
 import io.emeraldpay.polkaj.tx.Hashing;
 import io.emeraldpay.polkaj.types.ByteData;
 import io.emeraldpay.polkaj.types.Hash256;
+import java.util.List;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,13 +143,11 @@ public class BlockServiceImpl implements BlockService {
             for (int i = 0; i < extrinsics.size(); i++) {
                 var extrinsic = extrinsics.get(i);
 
-                //第一个为时间
                 if (i == 0) {
                     var ext = extrinsicReader.read(new ScaleCodecReader(extrinsic.getBytes()));
                     FusotaoTimestampSet time = (FusotaoTimestampSet) ext.getCall();
                     createTime = time.getNow().longValue();
                 }
-
 
                 var id = seq.incrementAndGet();
                 var data = extrinsic.getBytes();
@@ -189,6 +188,7 @@ public class BlockServiceImpl implements BlockService {
         blockHeaderRepository.save(number,
                 header.getExtrinsicsRoot().toString(),
                 header.getNumber(),
+                hash.toString(),
                 header.getParentHash().toString(),
                 header.getStateRoot().toString(),
                 createTime,
@@ -209,6 +209,51 @@ public class BlockServiceImpl implements BlockService {
     public Ext getExtById(long id) {
         var table = extrinsicSplitter.computeTable(id);
         return extRepository.queryExtId(id, table.tableName());
+    }
+
+    @Override
+    public List<BlockHeader> getBlockByIds(List<Long> ids) {
+        Splitter splitter = new LongHashSplitter(tableMetaService.getByPrefix(TableMetaService.BLOCK_HEADER));
+        var table_start = splitter.computeTable(ids.get(0));
+        var table_end = splitter.computeTable(ids.get(ids.size()-1));
+        List list = null;
+        if (table_end.equals(table_start)){
+            list = blockHeaderRepository.queryBlockByIds(ids,table_start.tableName());
+        }else {
+            for (int i = 0; i < ids.size(); i++) {
+                list = new ArrayList();
+                list.add(getBlockHeaderById(ids.get(i)));
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public List<Ext> getExtByIds(List<Long> ids) {
+        Splitter splitter = new LongHashSplitter(tableMetaService.getByPrefix(TableMetaService.EXTRINSICS));
+        var table_start = splitter.computeTable(ids.get(0));
+        var table_end = splitter.computeTable(ids.get(ids.size()-1));
+        List<Ext> list = null;
+        if (table_end.equals(table_start)){
+            list = extRepository.queryExtByIds(ids,table_start.tableName());
+        }else {
+            for (int i = 0; i < ids.size(); i++) {
+                list = new ArrayList();
+                list.add(getExtById(ids.get(i)));
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public Long lastExtNumber() {
+        var seq = seqRepository.queryByPrefix(TableMetaService.EXTRINSICS);
+        return seq.getValue();
+    }
+
+    @Override
+    public long getTimestampByExtId(long ext_id) {
+        return getBlockHeaderById(Long.parseLong(blockExtService.getExtIndexInBlockByExtId(ext_id).split("-")[0])).getCreateTime();
     }
 
     private long saveEvent(EventWriter writer, EventRecord event) {

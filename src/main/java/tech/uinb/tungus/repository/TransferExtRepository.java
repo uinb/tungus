@@ -32,7 +32,7 @@ public class TransferExtRepository {
 
     public List<TransferExt> query(long start, long end, String tableName) {
         return template.query(con -> {
-            var stat = con.prepareStatement("select * from " + tableName + " where id >= ? and id <= ?");
+            var stat = con.prepareStatement("select * from " + tableName + " where id > ? and id <= ? order by id desc");
             stat.setLong(1, start);
             stat.setLong(2, end);
             return stat;

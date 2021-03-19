@@ -28,6 +28,7 @@ public class BlockHeader {
     private Long blkId;
     private String extrinsics;
     private Long number;
+    private String hash;
     private String parentHash;
     private String stateRoot;
     private List<DigestLog> logs;
