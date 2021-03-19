@@ -18,16 +18,20 @@
  */
 package tech.uinb.tungus.repository;
 
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import tech.uinb.tungus.entity.BlockHeader;
 import tech.uinb.tungus.entity.Ext;
 
 import java.io.ByteArrayInputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import tech.uinb.tungus.repository.BlockHeaderRepository.BlockHeaderRowMapper;
 
 @Repository
 public class ExtRepository {
@@ -51,6 +55,17 @@ public class ExtRepository {
         }, extractor);
     }
 
+    public List<Ext> queryExtByIds(List<Long> ids,String tableName) {
+        StringBuffer bId = new StringBuffer();
+        for (int i = 0; i < ids.size(); i++) {
+            bId.append(ids.get(i).toString());
+            if (i!=ids.size()-1){
+                bId.append(",");
+            }
+        }
+        String in = "("+bId+")";
+        return template.query("select * from " + tableName + " where id in " + in +" ORDER BY id DESC ",new ExtRowMapper());
+    }
 
     private final ExtRepository.ExtResultExtractor extractor = new ExtRepository.ExtResultExtractor();
 
@@ -67,4 +82,15 @@ public class ExtRepository {
             return null;
         }
     }
+    class ExtRowMapper implements RowMapper<Ext> {
+
+        @Override
+        public Ext mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Ext ext = new Ext();
+            ext.setId(rs.getLong("id"));
+            ext.setData(rs.getBytes("data"));
+            return ext;
+        }
+    }
+
 }

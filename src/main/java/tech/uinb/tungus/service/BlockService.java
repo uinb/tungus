@@ -34,4 +34,11 @@ public interface BlockService {
     Ext getExtById(long id);
 
     List<BlockHeader> getBlockByIds(List<Long> ids);
+
+    List<Ext> getExtByIds(List<Long> ids);
+
+    Long lastExtNumber();
+
+    long getTimestampByExtId(long ext_id);
+
 }

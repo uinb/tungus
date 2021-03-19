@@ -228,6 +228,34 @@ public class BlockServiceImpl implements BlockService {
         return list;
     }
 
+    @Override
+    public List<Ext> getExtByIds(List<Long> ids) {
+        Splitter splitter = new LongHashSplitter(tableMetaService.getByPrefix(TableMetaService.EXTRINSICS));
+        var table_start = splitter.computeTable(ids.get(0));
+        var table_end = splitter.computeTable(ids.get(ids.size()-1));
+        List<Ext> list = null;
+        if (table_end.equals(table_start)){
+            list = extRepository.queryExtByIds(ids,table_start.tableName());
+        }else {
+            for (int i = 0; i < ids.size(); i++) {
+                list = new ArrayList();
+                list.add(getExtById(ids.get(i)));
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public Long lastExtNumber() {
+        var seq = seqRepository.queryByPrefix(TableMetaService.EXTRINSICS);
+        return seq.getValue();
+    }
+
+    @Override
+    public long getTimestampByExtId(long ext_id) {
+        return getBlockHeaderById(Long.parseLong(blockExtService.getExtIndexInBlockByExtId(ext_id).split("-")[0])).getCreateTime();
+    }
+
     private long saveEvent(EventWriter writer, EventRecord event) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ScaleCodecWriter wrt = new ScaleCodecWriter(out);

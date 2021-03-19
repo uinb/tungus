@@ -1,7 +1,6 @@
 package tech.uinb.tungus.service;
 
 import java.util.List;
-import tech.uinb.tungus.entity.ExtrinsicEvent;
 
 public interface ExtrinsicEventService {
 
