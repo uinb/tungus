@@ -2,11 +2,11 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-orange.svg)](#LICENSE) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](CONTRIBUTING.md)
 
-Tungus is a blockchain explorer of FUSOTAO,it provides a view of blocks,extrinsics,events and account info from a browser.
+Tungus is a blockchain explorer of FUSOTAO, which provides a view of blocks, extrinsics, events and account-infos from a browser.
 
 ## Before
 
-Tungus depends on [polkaj](https://github.com/emeraldpay/polkaj), you need to install polkaj first.
+Tungus depends on [polkaj](https://github.com/emeraldpay/polkaj), please install polkaj first.
 
 ```bash
 
@@ -45,7 +45,7 @@ nohup java -jar /target/tungus-0.0.1-SNAPSHOT.jar > tungus.log &
 
 ```
 
-The project will running at [http://localhost:8080](http://localhost:8080)
+The project will be running at [http://localhost:8080](http://localhost:8080)
 
 ## For frontend developers
 
