@@ -57,6 +57,9 @@ const AccountDetail: React.FC = () => {
   const [pageOptions, setPageOptions] = useState<IPage>(defaultPageOptions);
   const [loading, setLoading] = useState<boolean>(false);
   const onTabChange = useCallback((key: string) => {
+    if (activeKey === key) {
+      return;
+    }
     setActiveKey(key);
     setPageOptions(defaultPageOptions);
     getSingleList(key, defaultPageOptions);

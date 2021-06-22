@@ -20,7 +20,7 @@ const TransferList: React.FC<{
   api: ApiPromise;
 }> = ({ api }) => {
   const [transferList, setTransferList] = useState<ITransfer[]>([]);
-  useEffect(() => {
+  const getData = () => {
     getRecords('transfer', {
       page: 1,
       size: 5,
@@ -43,6 +43,15 @@ const TransferList: React.FC<{
         );
       }
     });
+  };
+  useEffect(() => {
+    getData();
+    const timer = setInterval(() => {
+      getData();
+    }, 6000);
+    return () => {
+      clearInterval(timer);
+    };
   }, []);
   return (
     <ul>

@@ -240,6 +240,12 @@ const Header: React.FC = (props) => {
               : 'none',
         }}
       >
+        <div className="dev">
+          <a href="https://github.com/uinb/tungus">
+            <p>Dev</p>
+            <p>Commit: {COMMIT}</p>
+          </a>
+        </div>
         <div className="base-container">
           <div className="header">
             <Locale />
