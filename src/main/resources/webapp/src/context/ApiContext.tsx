@@ -17,7 +17,7 @@
 
 import React, { useEffect, useContext, useState, FC } from 'react';
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import chainTypes from '../../config/chainTypes.json';
+import chainTypes from '../../config/chainTypes';
 interface IApiContext {
   api: ApiPromise | null;
   apiState: string;
